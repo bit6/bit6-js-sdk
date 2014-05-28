@@ -1,0 +1,7 @@
+---
+exclude: ['README.markdown']
+permalink: ':title'
+markdown: redcarpet
+highlighter: pygments
+safe: false
+title: 'Bit6 JS SDK'
