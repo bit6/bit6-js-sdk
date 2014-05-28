@@ -23,7 +23,7 @@ Coming soon...
   var opts = {
     apikey: 'MyApiKey',
   }
-  var bit6 = new Bit6(opts);
+  var b6 = new Bit6(opts);
 </script>
 ```
 
@@ -45,7 +45,7 @@ During the initialization you can also provide event handler functions. They wil
       console.log('Call ended from=', from);
     }
   }
-  var bit6 = new Bit6(opts);
+  var b6 = new Bit6(opts);
 </script>
 
 ```

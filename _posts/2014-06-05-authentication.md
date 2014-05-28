@@ -40,13 +40,13 @@ b6.login({identity: ident, password: 'secret'}, function(err) {
 ### Logout
 
 ```js
-bit6.logout();
+b6.logout();
 ```
 
 ### Check if the user is logged in
 
 ```js
-if (bit6.isLoggedIn()) {
+if (b6.isLoggedIn()) {
   console.log('User is logged in');
 }
 else {
