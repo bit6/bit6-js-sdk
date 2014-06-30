@@ -136,6 +136,18 @@ body {
   float: right;
 }
 
+a.thumb {
+  display: block;
+  text-align: center;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+
+a.thumb img {
+  max-width: 320px;
+  max-height: 320px;
+}
+
 #incomingCall {
   position: absolute;
   top: 60px;

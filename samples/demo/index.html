@@ -36,7 +36,7 @@
             <li><a target="_blank" href="http://bit6.com">About</a></li>
             <li><a target="_blank" href="http://github.com/bit6/bit6-js-sdk/">View on GitHub</a></li>
           </ul>
-          <ul class="nav navbar-nav navbar-right hide" id="loggedInNavbar">
+          <ul class="nav navbar-nav navbar-right hidden" id="loggedInNavbar">
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span id="loggedInUser"></span> <b class="caret"></b></a>
               <ul class="dropdown-menu">
@@ -107,7 +107,7 @@
       </div><!-- /#welcome -->
 
       <!-- Main Page -->
-      <div id="main" class="hide">
+      <div id="main" class="hidden">
 
           <!-- Incoming Call alert -->
           <div class="alert alert-warning fade in" id="incomingCall">
@@ -132,6 +132,7 @@
                   <video id="localVideo" autoplay muted></video>
                 </div>
                 <div class="modal-footer">
+                  <div id="inCallAudioDisabled" class="pull-left hidden">Audio disabled. Enable in demo.js</div>
                   <button type="button" class="btn btn-danger" data-dismiss="modal" id="hangup">Hangup</button>
                 </div>
               </div>
@@ -165,7 +166,7 @@
               <button class="btn btn-info" id="voiceCallButton">Voice</button>
               &nbsp;
               &nbsp;
-              <button class="btn btn-info" id="videoCallButton">Video</button> no audio
+              <button class="btn btn-info" id="videoCallButton">Video</button>
             </div>
           </div><!-- /.row -->
 

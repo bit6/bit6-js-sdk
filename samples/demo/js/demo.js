@@ -2,6 +2,11 @@
 var opts = {
     // IMPORTANT! Set your own Bit6 API key
     'apikey': 'MyApiKey',
+
+    // Uncomment if you run multiple instances on the same computer
+    // and do not want to get mic feedback
+    // 'disableAudio': true,
+
     'onRtMessage': onRtMessage,
     'onMessagesUpdated': onMessagesUpdated,
     'onIncomingCall': onIncomingCall,
@@ -59,8 +64,8 @@ function onRtMessage(m) {
 
 function loginDone() {
     $('#welcome').toggle(false);
-    $('#main').removeClass('hide');
-    $('#loggedInNavbar').removeClass('hide');
+    $('#main').removeClass('hidden');
+    $('#loggedInNavbar').removeClass('hidden');
     $('#loggedInUser').text(b6.loginIdentity);
     populateChatList();
 }
@@ -74,10 +79,22 @@ function populateChatList() {
         }
         var d = new Date(c.updated);
         var stamp = d.toLocaleDateString() + ' ' + d.toLocaleTimeString();
+        var latestText = '';
+        // Find the latest message in the conversation
+        if (c.messages && c.messages.length > 0) {
+            var latestMsg = c.messages[c.messages.length-1];
+            // Show the text from the latest conversation
+            if (latestMsg.content)
+                latestText = latestMsg.content;
+            // If no text, but has an attachment, show the mime type
+            else if (latestMsg.data && latestMsg.data.type) {
+                latestText = latestMsg.data.type;
+            }
+        }
         chatList.append(
             $('<div />')
                 .append($('<strong>' + c.title + '</strong>'))
-                .append($('<span>' + c.latestText + '</span>'))
+                .append($('<span>' + latestText + '</span>'))
                 .append($('<em>' + stamp + '</em>'))
                 .on('click', {'uri': c.uri}, function(e) {
                     showMessages(e.data.uri);
@@ -143,7 +160,17 @@ function showMessages(uri) {
         var stamp = (now - m.updated > t24h) ? d.toLocaleDateString() : d.toLocaleTimeString();
 
         var msgDiv = $('<div class="' + cssClass + '" />');
-        msgDiv.append($('<span>' + m.content + '</span>'));
+        // This message has an attachment
+        if (m.data) {
+            // TODO: handle location and audio clips properly
+            var attachType = m.data.type;
+            var thumbImg = m.data.thumb;
+            var href = m.data.attach;
+            msgDiv.append($('<a class="thumb" href="' + href + '" target="_new"><img src="' + thumbImg + '" /></a>'));            
+        }
+        if (m.content) {
+            msgDiv.append($('<span>' + m.content + '</span>'));
+        }
         msgDiv.append($('<i>' + stamp + '</i>'));
         if (!isIncoming) {
             msgDiv.append($('<em>' + getMessageStatusString(m) + '</em>'));
@@ -184,6 +211,10 @@ $(function() {
     $('.dropdown input, .dropdown label').click(function(e) {
         e.stopPropagation();
     });
+
+    if (b6.options.disableAudio) {
+        $('#inCallAudioDisabled').removeClass('hidden');
+    }
 
 
     // Login click
@@ -322,8 +353,8 @@ $(function() {
     $('#logout').click(function() {
         currentChatUri = null;
         $('#welcome').toggle(true);
-        $('#main').addClass('hide');
-        $('#loggedInNavbar').addClass('hide');
+        $('#main').addClass('hidden');
+        $('#loggedInNavbar').addClass('hidden');
         $('#loggedInUser').text('');
         $('#chatList').html('');
         $('#msgList').html('');
