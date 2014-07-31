@@ -13,7 +13,9 @@ You will need an API key in order to initialize and use Bit6 SDK. Get it [here](
 
 ### Install Using 'bower'
 
-Coming soon...
+```
+bower install bit6
+```
 
 ### Initialize the SDK
 

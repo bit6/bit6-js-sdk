@@ -1,7 +1,7 @@
 ---
+title: 'Bit6 JS SDK'
 exclude: ['README.markdown']
 permalink: ':title'
-markdown: redcarpet
-highlighter: pygments
+highlighter: 'pygments'
 safe: false
-title: 'Bit6 JS SDK'
+markdown: redcarpet
