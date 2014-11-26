@@ -5,17 +5,24 @@ layout: nil
 ---
 
 ### Get Bit6 API Key
-You will need an API key in order to initialize and use Bit6 SDK. Get it [here](http://bit6.com/contact/).
+You will need an API key to use the SDK. Get it [here](http://bit6.com/contact/).
 
-### Manual Installation
+### Install manually
 
-[Download](https://github.com/bit6/bit6-js-sdk/) the SDK. At a very minimum you will need just `bit6.min.js` file.
+[Download](https://github.com/bit6/bit6-js-sdk/) the SDK. At a very minimum you will need `bit6.min.js` file.
 
-### Install Using 'bower'
+### Install using 'bower'
 
 ```
 bower install bit6
 ```
+
+### Sample App
+
+The [demo.bit6.com](http://demo.bit6.com) app sources are located in `samples/demo/` folder in the SDK repo.
+
+The sample app is made as simple as possible to demonstrate the use of the Bit6 SDK. The UI is very basic and includes only the essential elements. Modify <b>`js/demo.js`</b> to include your API key.
+
 
 ### Initialize the SDK
 
@@ -25,29 +32,6 @@ bower install bit6
   var opts = {
     apikey: 'MyApiKey',
   }
-  var b6 = new Bit6(opts);
+  var b6 = new bit6.Client(opts);
 </script>
-```
-
-### Event Handlers
-
-During the initialization you can also provide event handler functions. They will be notified when a new call is received, messages updated etc.
-
-```html
-<script>
-  var opts = {
-    apikey: 'MyApiKey',
-    onMessagesUpdated: function() {
-      console.log('Messages updated');
-    },
-    onIncomingCall: function(from, hasVideo) {
-      console.log('Incoming call from=', from, ' hasVideo=', hasVideo);
-    },
-    onCallEnded: function(from) {
-      console.log('Call ended from=', from);
-    }
-  }
-  var b6 = new Bit6(opts);
-</script>
-
 ```

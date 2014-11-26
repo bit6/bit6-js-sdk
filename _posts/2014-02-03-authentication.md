@@ -11,12 +11,12 @@ Create a new user account with a username identity.
 // Convert username to an identity URI
 var ident = 'usr:' + 'john';
 b6.signup({identity: ident, password: 'secret'}, function(err) {
-    if (err) {
-        console.log('signup error', err);
-    }
-    else {
-        console.log('signup successful');
-    }
+  if (err) {
+    console.log('signup error', err);
+  }
+  else {
+    console.log('signup successful');
+  }
 });
 ```
 
@@ -28,12 +28,12 @@ Login into an existing account using an Identity and a password.
 // Convert username to an identity URI
 var ident = 'usr:' + 'john';
 b6.login({identity: ident, password: 'secret'}, function(err) {
-    if (err) {
-        console.log('login error', err);
-    }
-    else {
-        console.log('login successful');
-    }
+  if (err) {
+    console.log('login error', err);
+  }
+  else {
+    console.log('login successful');
+  }
 });
 ```
 
