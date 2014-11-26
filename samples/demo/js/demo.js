@@ -1,58 +1,40 @@
 
 var opts = {
     // IMPORTANT! Set your own Bit6 API key
-    'apikey': 'MyApiKey',
-
-    // Uncomment if you run multiple instances on the same computer
-    // and do not want to get mic feedback
-    // 'disableAudio': true,
-
-    'onRtMessage': onRtMessage,
-    'onMessagesUpdated': onMessagesUpdated,
-    'onIncomingCall': onIncomingCall,
-    'onCallEnded': onCallEnded
+    //'apikey': 'MyApiKey',
 };
 
-var b6 = new Bit6(opts);
+if (!opts.apikey) {
+    alert('Missing "apikey".\nSpecify it in bit6.Client() constructor!');
+}
 
+var b6 = new bit6.Client(opts);
 
+// Disable all audio in this demo
+var disableAudio = false;
 
 var currentChatUri = null;
 var lastTypingSent = 0;
 var typingLabelTimer = 0;
-var incomingCallFrom = null;
-var incomingCallVideo = false;
 
-function showUserTyping(flag) {
-    clearInterval(typingLabelTimer);
-    if (flag) {
-        typingLabelTimer = setTimeout(function() {
-            $('#msgOtherTyping').toggle(false);
-        }, 10000);
-    }
-    else {
-    }
-    $('#msgOtherTyping').toggle(flag);
-}
 
-function onMessagesUpdated() {
-    showUserTyping(false);
-    populateChatList();
-}
-
-function onIncomingCall(from, video) {
-    $('#incomingCallFrom').text(from + ' is calling...');
+// Incoming call from another user
+b6.on('incomingCall', function(c) {
+    console.log('Incoming call', c);
+    $('#incomingCallFrom').text(c.other + ' is calling...');
     $('#incomingCall')
-        .data({'from': from, 'video': video})
+        .data({'dialog': c})
         .show();
-}
+});
 
-function onCallEnded(other) {
-    console.log('Call ended other=', other);
-    $('#inCallModal').modal('hide');
-}
+// Messages have been changed, UI should be refreshed
+b6.on('messages', function() {
+    showUserTyping(false);
+    populateChatList();    
+});
 
-function onRtMessage(m) {
+// Got a real-time notification
+b6.on('notification', function(m) {
     console.log('demo got rt message', m);
     if (!m.type) return;
     if (m.type == 'typing') {
@@ -60,7 +42,9 @@ function onRtMessage(m) {
             showUserTyping(true);
         }
     }
-}
+});
+
+
 
 function loginDone() {
     $('#welcome').toggle(false);
@@ -103,6 +87,18 @@ function populateChatList() {
     }
     // Refresh the messages for the current conversation
     showMessages(currentChatUri);
+}
+
+function showUserTyping(flag) {
+    clearInterval(typingLabelTimer);
+    if (flag) {
+        typingLabelTimer = setTimeout(function() {
+            $('#msgOtherTyping').toggle(false);
+        }, 10000);
+    }
+    else {
+    }
+    $('#msgOtherTyping').toggle(flag);
 }
 
 // <temp> Will be moved to the SDK
@@ -198,9 +194,63 @@ function sendMessage() {
     });
 }
 
+function startOutgoingCall(to, video) {
+    // Show InCall modal
+    $('#inCallOther').text(to);
+    $('#inCallModal').modal('show');
+    // Outgoing call params
+    var opts = {
+        audio: !disableAudio,
+        video: video
+    };
+    // Start the outgoing call
+    var c = b6.startCall(to, opts);
+    callStarting(c);
+}
+
+function callStarting(c) {
+    // Store a reference to call controller
+    // in the InCallModal
+    $('#inCallModal').data({'dialog': c})
+
+    // Do not show video feeds area for audio-only call
+    $('#videoContainer').toggle(c.options.video);
+
+    // Call progress
+    c.on('progress', function() {
+        console.log('CALL progress', c);
+    });
+    // Call answered
+    c.on('answer', function() {
+        console.log('CALL answered', c);
+    });
+    // Error during the call
+    c.on('error', function() {
+        console.log('CALL error', c);
+    });
+    // Call ended
+    c.on('end', function() {
+        console.log('CALL ended', c);
+        $('#inCallModal')
+            .data({'dialog': null})
+            .modal('hide');        
+    });
+
+    // When starting a media connection, we need
+    // to provide media elements - <audio> or <video>
+    // For audio-only calls <video> also seem to work
+    var opts = {
+        localMediaEl: $('#localVideo')[0],
+        remoteMediaEl: $('#remoteVideo')[0]
+    };
+
+    // Start the call connection
+    c.connect(opts);
+}
+
 
 $(function() {
-    console.log( "ready!" );
+    console.log('Bit6 Demo Ready!');
 
     // Hide 'Typing' notification
     $('#msgOtherTyping').toggle(false);
@@ -287,23 +337,20 @@ $(function() {
     // Start a voice call
     $('#voiceCallButton').click(function() {
         console.log('Voice call clicked');
-        b6.startCall(currentChatUri, false, function(err) {
-            console.log('voice call res', err);
-            $('#inCallOther').text(currentChatUri);
-            $('#inCallModal').modal('show');
-            b6.initCallerWebRTC(currentChatUri, false);
-        });
+        startOutgoingCall(currentChatUri, false);
     });
 
     // Start a video call
     $('#videoCallButton').click(function() {
         console.log('Video call clicked');
-        b6.startCall(currentChatUri, true, function(err) {
-            console.log('video call res', err);
-            $('#inCallOther').text(currentChatUri);
-            $('#inCallModal').modal('show');
-            b6.initCallerWebRTC(currentChatUri, true);
-        });
+        startOutgoingCall(currentChatUri, true);
+    });
+
+    // Start a phone call
+    $('#phoneCallButton').click(function() {
+        console.log('Phone call clicked');
+        // For this demo call a helpdesk of a well-known store
+        startOutgoingCall('pstn:+18004663337', false);
     });
 
     // Key down event in compose input field
@@ -312,7 +359,7 @@ $(function() {
         var now = Date.now();
         if (now - lastTypingSent > 7000) {
             lastTypingSent = now;
-            b6.sendRtTyping(currentChatUri);
+            b6.sendTypingNotification(currentChatUri);
         }
     });
 
@@ -325,28 +372,44 @@ $(function() {
         }
     });
 
-    // Answer Incoming call click
+    // 'Answer Incoming Call' click
     $('#answer').click(function() {
-        var e = $('#incomingCall');
+        var e = $('#incomingCall').hide();
         var d = e.data();
-        e.hide();
-        $('#inCallOther').text(d.from);
-        $('#inCallModal').modal('show');
-        b6.answerIncomingCall(d.from, d.video);
+        // Call controller
+        if (d && d.dialog) {
+            var c = d.dialog;
+            // Prepare InCall UI
+            $('#inCallOther').text(c.other);
+            $('#inCallModal').modal('show');
+            // Accept the call
+            callStarting(c);
+            e.data({'dialog': null});
+        }
     });
 
-    // Reject Incoming call click
+    // 'Reject Incoming Call' click
     $('#reject').click(function() {
-        var e = $('#incomingCall');
+        var e = $('#incomingCall').hide();
         var d = e.data();
-        e.hide();
-        b6.rejectIncomingCall(d.from, d.video);
+        // Call controller
+        if (d && d.dialog) {
+            // Reject call
+            d.dialog.hangup();
+            e.data({'dialog': null});
+        }
     });
 
-    // Call Hangup click
+    // 'Call Hangup' click
     $('#hangup').click(function() {
-        $('#inCallModal').modal('hide');
-        b6.endCall();
+        var e = $('#inCallModal').modal('hide');
+        var d = e.data();
+        // Call controller
+        if (d && d.dialog) {
+            // Hangup the call
+            d.dialog.hangup();
+            e.data({'dialog': null});
+        }
     });
 
     // Logout click
