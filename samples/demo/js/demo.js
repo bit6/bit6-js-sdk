@@ -1,4 +1,3 @@
-
 var opts = {
     // IMPORTANT! Set your own Bit6 API key
     //'apikey': 'MyApiKey',
@@ -7,6 +6,7 @@ var opts = {
 if (!opts.apikey) {
     alert('Missing "apikey".\nSpecify it in bit6.Client() constructor!');
 }
+
 
 var b6 = new bit6.Client(opts);
 
@@ -239,10 +239,16 @@ function callStarting(c) {
     // When starting a media connection, we need
     // to provide media elements - <audio> or <video>
     // For audio-only calls <video> also seem to work
-    var opts = {
-        localMediaEl: $('#localVideo')[0],
-        remoteMediaEl: $('#remoteVideo')[0]
-    };
+    var opts = {};
+    // Video call
+    if (c.options.video) {
+        opts.localMediaEl = $('#localVideo')[0];
+        opts.remoteMediaEl = $('#remoteVideo')[0];
+    }
+    // Audio call
+    else {
+        opts.remoteMediaEl = $('#remoteAudio')[0];
+    }
 
     // Start the call connection
     c.connect(opts);
