@@ -1,5 +1,5 @@
 ---
-category: session
+category: authentication
 title: 'Username'
 ---
 
