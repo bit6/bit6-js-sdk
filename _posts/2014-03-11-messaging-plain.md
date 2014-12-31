@@ -1,7 +1,6 @@
 ---
-category: basic messaging
+category: messaging
 title: 'Text Messages'
-layout: nil
 ---
 
 ### Send Text Message

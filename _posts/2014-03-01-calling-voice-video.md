@@ -1,7 +1,6 @@
 ---
 category: calling
 title: 'Voice & Video Calls'
-layout: nil
 ---
 
 ### Call Controller - Dialog

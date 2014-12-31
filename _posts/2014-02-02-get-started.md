@@ -1,7 +1,5 @@
 ---
 title: 'Getting Started'
-
-layout: nil
 ---
 
 ### Get Bit6 API Key
@@ -9,7 +7,7 @@ You will need an API key to use the SDK. Get it [here](http://bit6.com/contact/)
 
 ### Install manually
 
-[Download](https://github.com/bit6/bit6-js-sdk/) the SDK. At a very minimum you will need `bit6.min.js` file.
+[Download](https://github.com/bit6/bit6-js-sdk/) the SDK. You just need `bit6.min.js` file.
 
 ### Install using 'bower'
 
@@ -31,7 +29,7 @@ The sample app is made as simple as possible to demonstrate the use of the Bit6 
 <script>
   var opts = {
     apikey: 'MyApiKey',
-  }
+  };
   var b6 = new bit6.Client(opts);
 </script>
 ```

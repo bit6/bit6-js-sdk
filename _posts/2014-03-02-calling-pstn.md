@@ -1,7 +1,6 @@
 ---
 category: calling
 title: 'Phone/PSTN Calls'
-layout: nil
 ---
 
 ### Start a Phone Call

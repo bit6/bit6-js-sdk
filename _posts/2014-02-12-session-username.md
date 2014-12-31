@@ -1,11 +1,13 @@
 ---
-title: 'Authentication'
-layout: nil
+category: session
+title: 'Username'
 ---
+
+A username is case-insensitive and must consist of alphanumeric characters, e.g. `usr:john` or  `usr:test123`.
 
 ### Create user account
 
-Create a new user account with a username identity.
+Create a new user account with a username identity and a password.
 
 ```js
 // Convert username to an identity URI
@@ -35,21 +37,4 @@ b6.login({identity: ident, password: 'secret'}, function(err) {
     console.log('login successful');
   }
 });
-```
-
-### Logout
-
-```js
-b6.logout();
-```
-
-### Check if the user is logged in
-
-```js
-if (b6.isLoggedIn()) {
-  console.log('User is logged in');
-}
-else {
-  console.log('User is not logged in');
-}
 ```
