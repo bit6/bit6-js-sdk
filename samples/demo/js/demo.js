@@ -1,12 +1,11 @@
+
 var opts = {
     // IMPORTANT! Set your own Bit6 API key
     //'apikey': 'MyApiKey',
 };
-
 if (!opts.apikey) {
     alert('Missing "apikey".\nSpecify it in bit6.Client() constructor!');
 }
-
 
 var b6 = new bit6.Client(opts);
 
@@ -21,7 +20,7 @@ var typingLabelTimer = 0;
 // Incoming call from another user
 b6.on('incomingCall', function(c) {
     console.log('Incoming call', c);
-    $('#incomingCallFrom').text(c.other + ' is calling...');
+    $('#incomingCallFrom').text(b6.getNameFromIdentity(c.other) + ' is calling...');
     $('#incomingCall')
         .data({'dialog': c})
         .show();
@@ -36,10 +35,11 @@ b6.on('messages', function() {
 // Got a real-time notification
 b6.on('notification', function(m) {
     console.log('demo got rt message', m);
-    if (!m.type) return;
     if (m.type == 'typing') {
-        if (m.from == currentChatUri) {
-            showUserTyping(true);
+        isSentToGroup = m.to.indexOf('grp:') == 0
+        key = isSentToGroup ? m.to : m.from
+        if (key == currentChatUri) {
+            showUserTyping(m.from);
         }
     }
 });
@@ -50,7 +50,7 @@ function loginDone() {
     $('#welcome').toggle(false);
     $('#main').removeClass('hidden');
     $('#loggedInNavbar').removeClass('hidden');
-    $('#loggedInUser').text(b6.loginIdentity);
+    $('#loggedInUser').text( b6.getNameFromIdentity(b6.session.identity) );
     populateChatList();
 }
 
@@ -77,7 +77,7 @@ function populateChatList() {
         }
         chatList.append(
             $('<div />')
-                .append($('<strong>' + c.title + '</strong>'))
+                .append($('<strong>' + b6.getNameFromIdentity(c.uri) + '</strong>'))
                 .append($('<span>' + latestText + '</span>'))
                 .append($('<em>' + stamp + '</em>'))
                 .on('click', {'uri': c.uri}, function(e) {
@@ -89,26 +89,49 @@ function populateChatList() {
     showMessages(currentChatUri);
 }
 
-function showUserTyping(flag) {
+function showUserTyping(ident) {
     clearInterval(typingLabelTimer);
-    if (flag) {
+    if (ident) {
         typingLabelTimer = setTimeout(function() {
             $('#msgOtherTyping').toggle(false);
         }, 10000);
+        ident = b6.getNameFromIdentity(ident);
+        var txt = ident + ' is typing...';
+        $('#msgOtherTyping').html(txt);
     }
-    else {
-    }
-    $('#msgOtherTyping').toggle(flag);
+    $('#msgOtherTyping').toggle(ident ? true : false);
 }
 
-// <temp> Will be moved to the SDK
+
+// TODO: Will be moved to the SDK
 
 function isIncomingMessage(m) {
     return (m.flags & 0x1000) != 0;
 }
 
 function getMessageStatusString(m) {
+    // Status value
     var t = m.flags & 0x000f;
+
+    // Is this an outgoing message?
+    if (!isIncomingMessage(m)) {
+        // Multiple destinations
+        if (m.others) {
+            var d = [];
+            // Was it delievered to any destinations?
+            for(var i=0; i < m.others.length; i++) {
+                var o = m.others[i];
+                if (o.status == 0x0004) {
+                    d.push(b6.getNameFromIdentity(o.uri));
+                }
+            }
+            // List destinations it was delivered to
+            if (d.length) {
+                return d.join(', ');
+            }
+        }
+    }
+
     switch(t) {
         case 0x0001: return 'Sending';
         case 0x0002: return 'Sent';
@@ -119,10 +142,16 @@ function getMessageStatusString(m) {
     return '';
 }
 
-// </temp>
 
 function showMessages(uri) {
     console.log('Show messages for ', uri);
+
+    if (uri.indexOf('grp:') == 0) {
+        b6.api('/groups/'+uri.substring(4), function(err, g) {
+            console.log('Got group err=', err, 'group=', g);            
+        });
+    }
+
     if (uri != currentChatUri) {
         showUserTyping(false);
     }
@@ -137,7 +166,7 @@ function showMessages(uri) {
     currentChatUri = uri;
     var conv = b6.getConversationByUri(uri);
 
-    $('#msgOtherName').text(conv.title);
+    $('#msgOtherName').text( b6.getNameFromIdentity(conv.uri) );
     $('#voiceCallButton').toggle(true);
     $('#videoCallButton').toggle(true);
 
@@ -168,7 +197,10 @@ function showMessages(uri) {
             msgDiv.append($('<span>' + m.content + '</span>'));
         }
         msgDiv.append($('<i>' + stamp + '</i>'));
-        if (!isIncoming) {
+        if (isIncoming) {
+            msgDiv.append($('<em>' + b6.getNameFromIdentity(m.other) + '</em>'));
+        }
+        else {
             msgDiv.append($('<em>' + getMessageStatusString(m) + '</em>'));
         }
         msgList.append(msgDiv);
@@ -178,7 +210,7 @@ function showMessages(uri) {
 
 function sendMessage() {
     var content = $('#msgText').val();
-    var me = b6.loginIdentity;
+    var me = b6.session.identity;
     var other = currentChatUri;
     if (!content || !other) return
     $('#msgText').val('');
@@ -196,7 +228,7 @@ function sendMessage() {
 
 function startOutgoingCall(to, video) {
     // Show InCall modal
-    $('#inCallOther').text(to);
+    $('#inCallOther').text( b6.getNameFromIdentity(to) );
     $('#inCallModal').modal('show');
     // Outgoing call params
     var opts = {
@@ -268,7 +300,7 @@ $(function() {
         e.stopPropagation();
     });
 
-    if (b6.options.disableAudio) {
+    if (disableAudio) {
         $('#inCallAudioDisabled').removeClass('hidden');
     }
 
@@ -279,7 +311,7 @@ $(function() {
         // Convert username to an identity URI
         var ident = 'usr:' + $('#loginUsername').val();
         var pass = $('#loginPassword').val();
-        b6.login({'identity': ident, 'password': pass}, function(err) {
+        b6.session.login({'identity': ident, 'password': pass}, function(err) {
             if (err) {
                 console.log('login error', err);
                 $('#loginError').html('<p>' + err.message + '</p>');
@@ -298,7 +330,7 @@ $(function() {
         // Convert username to an identity URI
         var ident = 'usr:' + $('#signupUsername').val();
         var pass = $('#signupPassword').val();
-        b6.signup({'identity': ident, 'password': pass}, function(err) {
+        b6.session.signup({'identity': ident, 'password': pass}, function(err) {
             if (err) {
                 console.log('signup error', err);
                 $('#signupError').html('<p>' + err.message + '</p>');
@@ -386,7 +418,7 @@ $(function() {
         if (d && d.dialog) {
             var c = d.dialog;
             // Prepare InCall UI
-            $('#inCallOther').text(c.other);
+            $('#inCallOther').text( b6.getNameFromIdentity(c.other) );
             $('#inCallModal').modal('show');
             // Accept the call
             callStarting(c);
@@ -427,7 +459,7 @@ $(function() {
         $('#loggedInUser').text('');
         $('#chatList').html('');
         $('#msgList').html('');
-        b6.logout();
+        b6.session.logout();
     });
 
 });
