@@ -12,7 +12,7 @@ Create a new user account with a username identity and a password.
 ```js
 // Convert username to an identity URI
 var ident = 'usr:' + 'john';
-b6.signup({identity: ident, password: 'secret'}, function(err) {
+b6.session.signup({identity: ident, password: 'secret'}, function(err) {
   if (err) {
     console.log('signup error', err);
   }
@@ -29,7 +29,7 @@ Login into an existing account using an Identity and a password.
 ```js
 // Convert username to an identity URI
 var ident = 'usr:' + 'john';
-b6.login({identity: ident, password: 'secret'}, function(err) {
+b6.session.login({identity: ident, password: 'secret'}, function(err) {
   if (err) {
     console.log('login error', err);
   }

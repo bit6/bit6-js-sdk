@@ -8,7 +8,7 @@ Bit6 integrates with various OAuth1 and OAuth2 providers for simplified user aut
 ### Get configured OAuth providers
 
 ```js
-b6.getAuthInfo(function(err, infos) {
+b6.session.getAuthInfo(function(err, infos) {
   if (err) {
     console.log('error', err);
   }
@@ -40,7 +40,7 @@ Create a new Bit6 account or login into an existing one. In this example we use 
 FB.login(function(resp) {
   if (resp.authRespone) {
     // resp.authRespone object contains an authorization code or access token
-    b6.oauth('facebook', resp.authRespone, function(err) {
+    b6.session.oauth('facebook', resp.authRespone, function(err) {
       if (err) {
         console.log('oauth error', err);
       }

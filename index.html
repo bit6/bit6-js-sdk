@@ -9,7 +9,7 @@ layout: default
 <section id='content'>
 {% for post in site.posts reversed %}
   <article class='{{ post.type }}'>
-    <a name='{{ post.url | remove: "/" }}' href='#{{ post.url | remove: "/" }}'><h2>{% if post.type %}<code><b>{{ post.type }}</b> {{ post.path }}</code> {% endif %}{{ post.title }}</h2></a>
+    <a name='{{ post.url | remove: "/" }}' href='#{{ post.url | remove: "/" }}'><h2>{% if post.type %}<code><b>{{ post.type }}</b> {{ post.path }}</code> {% elsif post.category %}<span>{{ post.category }}</span>{% endif %}{{ post.title }}</h2></a>
     <section class='body'>
       {{ post.content }}
     </section>

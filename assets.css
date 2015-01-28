@@ -457,8 +457,7 @@ h2,
 h3,
 h4,
 p,
-ul,
-code {
+ul {
   margin: 0 0 20px;
 }
 
@@ -542,7 +541,7 @@ code {
 #content {
   padding: 20px;
   padding-left: 260px;
-  max-width: 700px;
+/*  max-width: 700px; */
 }
 
 #content .control {
@@ -641,6 +640,13 @@ code {
   background: #e02a10;
 }
 
+/* Category */
+#content article a h2 span {
+  float: right;
+  font-size: 14px;
+  color: #888;
+}
+
 /* Reference's body */
 #content h3 {
 }
@@ -651,7 +657,7 @@ code {
   padding: 15px 15px 0;
 }
 
-#content .body code {
+.body code {
   border: 1px solid #e2e7ea;
   background: #eef1f2;
   border-radius: 2px;
@@ -662,7 +668,7 @@ code {
   font-size: 0.85em;
 }
 
-#content .body p > code {
+.body p > code {
 /*  display: block;
   padding: 15px; */
   white-space: pre;
@@ -671,6 +677,33 @@ code {
 pre > code {
   display: block;
   padding: 1em;
+}
+
+/* Background for scrollable code blocks */
+
+div.highlight code {
+  border: none;
+  background: #eef1f2;
+}
+
+div.highlight pre {
+  border: 1px solid #e2e7ea;
+  background: #eef1f2;
+  border-radius: 2px;
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+}
+
+#content img {
+  display: block;
+  max-width: 100%;
+  padding: 1em;
+  margin: 1em 0;
+  border: 1px solid #e2e7ea;
+  border-radius: 2px;
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+  box-sizing: border-box;
 }
 
 .hll { background-color: #ffffcc }
