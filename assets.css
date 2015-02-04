@@ -694,7 +694,7 @@ div.highlight pre {
   -webkit-border-radius: 2px;
 }
 
-#content img {
+#content img.shot {
   display: block;
   max-width: 100%;
   padding: 1em;

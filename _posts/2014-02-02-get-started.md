@@ -3,17 +3,17 @@ title: 'Getting Started'
 ---
 
 ### Get Bit6 API Key
-Get API key [here](http://bit6.com/contact/).
+Go to [Dashboard](https://dashboard.bit6.com/) and get the API Key for your app.
 
-### Install manually
+### Install JS SDK
 
-Get the SDK from [GitHub Repo](https://github.com/bit6/bit6-js-sdk/) the SDK. You just need `bit6.min.js` file.
-
-### Install using 'bower'
+Either use 'bower'
 
 ```
 bower install bit6
 ```
+
+Or get the SDK from [GitHub Repo](https://github.com/bit6/bit6-js-sdk/). You just need `bit6.min.js` file.
 
 ### Initialize the SDK
 
