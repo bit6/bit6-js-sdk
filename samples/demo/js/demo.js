@@ -20,6 +20,7 @@ var typingLabelTimer = 0;
 // Incoming call from another user
 b6.on('incomingCall', function(c) {
     console.log('Incoming call', c);
+    callEvents(c);
     $('#incomingCallFrom').text(b6.getNameFromIdentity(c.other) + ' is calling...');
     $('#incomingCall')
         .data({'dialog': c})
@@ -237,17 +238,11 @@ function startOutgoingCall(to, video) {
     };
     // Start the outgoing call
     var c = b6.startCall(to, opts);
-    callStarting(c);
+    callEvents(c);
+    callUI(c);
 }
 
-function callStarting(c) {
-    // Store a reference to call controller
-    // in the InCallModal
-    $('#inCallModal').data({'dialog': c})
-
-    // Do not show video feeds area for audio-only call
-    $('#videoContainer').toggle(c.options.video);
-
+function callEvents(c) {
     // Call progress
     c.on('progress', function() {
         console.log('CALL progress', c);
@@ -266,7 +261,19 @@ function callStarting(c) {
         $('#inCallModal')
             .data({'dialog': null})
             .modal('hide');        
+        $('#incomingCall')
+            .data({'dialog': null})
+            .hide();
     });
+}
+
+function callUI(c) {
+    // Store a reference to call controller
+    // in the InCallModal
+    $('#inCallModal').data({'dialog': c})
+
+    // Do not show video feeds area for audio-only call
+    $('#videoContainer').toggle(c.options.video);
 
     // When starting a media connection, we need
     // to provide media elements - <audio> or <video>
@@ -421,7 +428,7 @@ $(function() {
             $('#inCallOther').text( b6.getNameFromIdentity(c.other) );
             $('#inCallModal').modal('show');
             // Accept the call
-            callStarting(c);
+            callUI(c);
             e.data({'dialog': null});
         }
     });
