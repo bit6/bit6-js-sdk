@@ -9,7 +9,7 @@ Go to [Dashboard](https://dashboard.bit6.com/) and get the API Key for your app.
 
 Either use 'bower'
 
-```
+```sh
 bower install bit6
 ```
 
