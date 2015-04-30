@@ -2,6 +2,10 @@ body {
   padding-top: 50px;
 }
 
+html, body, .fh {
+  height: 100%;
+}
+
 .intro {
   padding: 20px 15px;
   text-align: center;
@@ -70,8 +74,8 @@ body {
 }
 
 .top-row {
-  margin-top: 20px;
-  margin-bottom: 20px;
+  padding-top: 20px;
+  padding-bottom: 20px;
 }
 
 .top-row h3 {
@@ -101,13 +105,36 @@ body {
   display: none;
 }
 
+#detailPane, #inCallPane {
+  position: relative;
+}
+
 #msgOtherTyping {
   padding: 6px;
 }
 
-#msgLists {
+#msgComposeRow {
+  background-color: #f5f5f5;
+  margin: 0px;
+  padding: 10px 0;
+  position: absolute;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+}
+
+#msgListRow {
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    bottom: 55px;
+    top: 80px;
+    margin: 0px;
+}
+
+#msgList {
   position: relative;
-  height: 400px;
+  height: 100%;
   overflow-y: auto;
 }
 
@@ -175,23 +202,37 @@ a.thumb img {
 }
 
 #videoContainer {
-  width: 100%;
-  position: relative;
-}
-
-#remoteVideo {
-  width: 100%;
-  height: 100%;
-  border: 2px solid red;
-}
-
-#localVideo {
-  width: 30%;
-  height: 30%;
-  border: 1px solid #fff;
   position: absolute;
-  top: 10px;
-  right: 10px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  top: 80px;
+  margin: 0px;
+  text-align: center;
+}
+
+#videoContainer.simple > .remote {
+  max-width: 100%;
+  max-height: 100%;
+  width: 100%;
+}
+
+#videoContainer.simple > .local {
+  max-width: 30%;
+  max-height: 30%;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  border-left: 1px solid #fff;
+  border-bottom: 1px solid #fff;
+  width: auto;
+  height: auto;
+}
+
+#videoContainer.grid > video {
+  max-width: 50%;
+  max-height: 50%;
+  padding: 0 4px 4px 0;
 }
 
 
@@ -201,8 +242,8 @@ a.thumb img {
 @media only screen and (max-width : 768px) {
   /* Adjust top row margins on small screen */
   .top-row {
-    margin-top: 10px;
-    margin-bottom: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
   }
 
   /* On small screen by default DetailPane is hidden */

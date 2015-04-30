@@ -23,13 +23,13 @@ function initApp(b6) {
 
     // A conversation has changed
     b6.on('conversation', function(c, op) {
-        console.log('onConv', c);
+        //console.log('onConv', c);
         onConversationChange(c, op);
     });
 
     // A message has changed
     b6.on('message', function(m, op) {
-        console.log('onMsg', m);
+        //console.log('onMsg', m);
         onMessageChange(m, op);
     });
 
@@ -86,7 +86,7 @@ function initApp(b6) {
         var chats = $('#chatList').children();
         if (chats.length > 0) {
             // Simulate a click on the first chat
-            console.log('Seleting first chat');
+            console.log('Selecting first chat');
             chats.first().click();
         }
         // No more chats
@@ -140,7 +140,7 @@ function initApp(b6) {
             msgsDiv = $('<div class="msgs" />')
                 .attr('id', msgsId.substring(1))
                 .hide();
-            $('#msgLists').append(msgsDiv);
+            $('#msgList').append(msgsDiv);
         }
 
 
@@ -312,11 +312,11 @@ function initApp(b6) {
     }
 
     function showMessages(uri) {
-        console.log('Show messages for ', uri);
+        console.log('Show messages for', uri);
 
         //if (uri.indexOf('grp:') == 0) {
         //    b6.api('/groups/'+uri.substring(4), function(err, g) {
-        //        console.log('Got group err=', err, 'group=', g);            
+        //        console.log('Got group err=', err, 'group=', g);
         //    });
         //}
 
@@ -344,7 +344,7 @@ function initApp(b6) {
             // Some messages have been marked as read
             // update chat list
             console.log('Messages marked as read');
-        } 
+        }
 
         $('#msgOtherName').text( b6.getNameFromIdentity(conv.id) );
         $('#chatButtons').toggle(true);
@@ -392,7 +392,7 @@ function initApp(b6) {
 
     // Scroll to the last message in the messages list
     function scrollToLastMessage() {
-        var t = $('#msgLists');
+        var t = $('#msgList');
         t.scrollTop( t[0].scrollHeight );
     }
 
@@ -415,9 +415,6 @@ function initApp(b6) {
 
     // Start an outgoing call
     function startOutgoingCall(to, video) {
-        // Show InCall modal
-        $('#inCallOther').text( b6.getNameFromIdentity(to) );
-        $('#inCallModal').modal('show');
         // Outgoing call params
         var opts = {
             audio: !disableAudio,
@@ -425,15 +422,25 @@ function initApp(b6) {
         };
         // Start the outgoing call
         var c = b6.startCall(to, opts);
-        attachCallEvents(c);
-        showInCallUI(c);
+        if (c) {
+            attachCallEvents(c);
+            showInCallUI(c);
+        }
     }
 
     // Attach call state events to a RtcDialog
     function attachCallEvents(c) {
         // Call progress
         c.on('progress', function() {
+            showInCallName();
             console.log('CALL progress', c);
+        });
+        // Number of video feeds/elements changed
+        c.on('videos', function() {
+            var container = $('#videoContainer');
+            var elems = container.children();
+            console.log('VIDEO elems: ', elems.length, elems);
+            container.attr('class', elems.length > 2 ? 'grid' : 'simple');
         });
         // Call answered
         c.on('answer', function() {
@@ -445,10 +452,21 @@ function initApp(b6) {
         });
         // Call ended
         c.on('end', function() {
+            showInCallName();
             console.log('CALL ended', c);
-            $('#inCallModal')
-                .data({'dialog': null})
-                .modal('hide');        
+            // Remove the remote media elem
+            var e = c.options.remoteMediaEl;
+            if (e && e.parentNode) {
+                e.parentNode.removeChild(e);
+            }
+            // No more dialogs?
+            if (b6.dialogs.length == 0) {
+                // Hide InCall UI
+                $('#detailPane').removeClass('hidden');
+                $('#inCallPane').addClass('hidden');
+            }
+            // Hide Incoming Call dialog
+            // TODO: check that it was for this dialog
             $('#incomingCall')
                 .data({'dialog': null})
                 .hide();
@@ -456,31 +474,63 @@ function initApp(b6) {
     }
 
     function showInCallUI(c) {
-        // Store a reference to call controller
-        // in the InCallModal
-        $('#inCallModal').data({'dialog': c})
+        showInCallName();
+
+        $('body').addClass('detail');
+
+        $('#detailPane').addClass('hidden');
+        $('#inCallPane').removeClass('hidden');
 
         // Do not show video feeds area for audio-only call
-        $('#videoContainer').toggle(c.options.video);
+        var div = $('#videoContainer').toggle(c.options.video);
 
         // When starting a media connection, we need
-        // to provide media elements - <audio> or <video>
-        // For audio-only calls <video> also seem to work
+        // to provide either:
+        // 1) for audio call:
+        //    a) <audio> element as remoteMediaEl, or
+        //    b) nothing - let SDK handle it
+        // 2) for video call:
+        //    a) <video> elements as remoteMediaEl and localMediaEl, or
+        //    b) containerEl that will be populated by <video> elements
+        //       by the SDK. <video class="local"> / <video class="remote">
         var opts = {};
         // Video call
         if (c.options.video) {
-            opts.localMediaEl = $('#localVideo')[0];
-            opts.remoteMediaEl = $('#remoteVideo')[0];
+            // Can set specific elements here
+            //var rv = $('<video autoplay class="remote" />');
+            //div.prepend(rv);
+            //opts.remoteMediaEl = rv[0];
+            //opts.localMediaEl = $('#localVideo')[0];
+            // Container is required if not setting specific video elements
+            opts.containerEl = div[0];
         }
         // Audio call
         else {
-            opts.remoteMediaEl = $('#remoteAudio')[0];
+            // Can specify here, or let SDK handle it
+            //var rv = $('<audio autoplay class="remote" />');
+            //div.prepend(rv);
+            //opts.remoteMediaEl = rv[0];
         }
 
         // Start the call connection
         c.connect(opts);
     }
 
+    // Show all the call participants
+    function showInCallName() {
+        var s = '';
+        for(var i in b6.dialogs) {
+            var d = b6.dialogs[i];
+            if (i == 0) {
+                //s = d.options.video ? 'Video Call: ' : 'Voice Call: ';
+            }
+            else {
+                s += ', ';
+            }
+            s += b6.getNameFromIdentity(d.other);
+        }
+        $('#inCallOther').text(s);
+    }
 
     console.log('Bit6 Demo Ready!');
 
@@ -509,7 +559,17 @@ function initApp(b6) {
     $('#chatList').on('click', '.tab', function(e) {
         var id = $(this).attr('id');
         var convId = domIdToConversationId(id);
-        showMessages(convId);
+        // Do we have ongoing calls?
+        if (b6.dialogs.length > 0) {
+            var d = b6.dialogs[0];
+            // Add the user to the conversation
+            startOutgoingCall(convId, d.options.video);
+        }
+        // No ongoing calls
+        else {
+            // Select the chat
+            showMessages(convId);
+        }
     });
 
     // Clicking on Navbar takes you back into the chat list
@@ -519,7 +579,7 @@ function initApp(b6) {
     });
 
     // Click on a message deletes it
-    //$('#msgLists').on('click', '.msg', function(e) {
+    //$('#msgList').on('click', '.msg', function(e) {
     //    var id = $(this).attr('id');
     //    var msgId = domIdToMessageId(id);
     //    console.log('Clicked to delete message', msgId);
@@ -596,7 +656,7 @@ function initApp(b6) {
     });
 
     // Send message when user hits Enter
-    $('#msgText').keyup(function(e) { 
+    $('#msgText').keyup(function(e) {
         var code = e.which;
         if (code == 13) {
             e.preventDefault();
@@ -611,9 +671,6 @@ function initApp(b6) {
         // Call controller
         if (d && d.dialog) {
             var c = d.dialog;
-            // Prepare InCall UI
-            $('#inCallOther').text( b6.getNameFromIdentity(c.other) );
-            $('#inCallModal').modal('show');
             // Accept the call
             showInCallUI(c);
             e.data({'dialog': null});
@@ -634,13 +691,13 @@ function initApp(b6) {
 
     // 'Call Hangup' click
     $('#hangup').click(function() {
-        var e = $('#inCallModal').modal('hide');
-        var d = e.data();
-        // Call controller
-        if (d && d.dialog) {
-            // Hangup the call
-            d.dialog.hangup();
-            e.data({'dialog': null});
+        $('#detailPane').removeClass('hidden');
+        $('#inCallPane').addClass('hidden');
+        // Hangup all active calls
+        var x = b6.dialogs.slice();
+        for (var i in x) {
+            console.log('multi-hangup: ', x[i]);
+            x[i].hangup();
         }
     });
 
@@ -652,7 +709,7 @@ function initApp(b6) {
         $('#loggedInNavbar').addClass('hidden');
         $('#loggedInUser').text('');
         $('#chatList').empty();
-        $('#msgLists').empty();
+        $('#msgList').empty();
         b6.session.logout();
     });
 

@@ -8,14 +8,12 @@
     <meta name="author" content="Bit6">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
 
-    <title>Bit6 Demo 0.9.0</title>
+    <title>Bit6 Demo 0.9.1</title>
 
     <!-- Bootstrap core CSS -->
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
-
     <!-- Custom styles -->
     <link href="css/demo.css" rel="stylesheet">
-
   </head>
 
   <body>
@@ -48,7 +46,7 @@
       </div>
     </div>
 
-    <div class="container">
+    <div class="container fh">
 
         <!-- Welcome page -->
         <div id="welcome">
@@ -79,7 +77,7 @@
       </div><!-- /#welcome -->
 
       <!-- Main Page -->
-      <div id="main" class="hidden">
+      <div id="main" class="hidden fh">
 
           <!-- Incoming Call alert -->
           <div class="alert alert-warning fade in" id="incomingCall">
@@ -91,44 +89,18 @@
             </p>
           </div>
 
-          <!-- Video Call modal -->
-          <div class="modal fade" id="inCallModal" tabindex="-1" role="dialog" aria-labelledby="inCallOther" aria-hidden="true">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <!-- <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button> -->
-                  <h4 class="modal-title" id="inCallOther">Video Call</h4>
-                </div>
-                <div class="modal-body">
-                  <div id="videoContainer">
-                    <!-- For audio-only calls, note <video> will also work for such calls -->
-                    <audio id="remoteAudio" autoplay></audio>
-                    <!-- For video calls -->
-                    <video id="remoteVideo" autoplay></video>
-                    <video id="localVideo" autoplay muted></video>
-                  </div>
-                </div>
-                <div class="modal-footer">
-                  <div id="inCallAudioDisabled" class="pull-left hidden">Audio disabled. Enable in demo.js</div>
-                  <button type="button" class="btn btn-danger" data-dismiss="modal" id="hangup">Hangup</button>
-                </div>
-              </div>
-            </div>
-          </div>
 
-
-
-          <div class="row">
+          <div class="row fh">
 
             <!-- col1 -->
-            <div class="col-sm-4" id="listPane">
+            <div class="col-sm-4 fh" id="listPane">
 
               <div class="row top-row">
                 <div class="col-sm-12 col-xs-7">
                   <!-- New Chat dropdown -->
                   <ul class="nav nav-pills pull-right">
                     <li class="dropdown" id="newChatDropdown">
-                      <a id="drop1" role="button" data-toggle="dropdown" href="#">New  
+                      <a id="drop1" role="button" data-toggle="dropdown" href="#">New
                           <b class="caret"></b></a>
                       <form id="newChatMenu" class="dropdown-menu" role="menu" aria-labelledby="drop1">
                         <input type="text" class="form-control" id="newChatUsername" placeholder="Enter username">
@@ -149,7 +121,7 @@
 
 
             <!-- col2 -->
-            <div class="col-sm-8" id="detailPane">
+            <div class="col-sm-8 fh" id="detailPane">
 
               <div class="row top-row">
                 <div class="col-sm-5 col-xs-5">
@@ -175,12 +147,12 @@
                 </div>
               </div>
 
-              <div class="row">
-                <div class="" id="msgLists"></div>
+              <div class="row" id="msgListRow">
+                <div id="msgList"></div>
               </div>
 
               <!-- Compose message area -->
-              <div class="row" style="background-color: #f5f5f5; padding: 10px 0">
+              <div class="row" id="msgComposeRow">
                 <div class="col-sm-4">
                   <div class="bg-info" id="msgOtherTyping"></div>
                 </div>
@@ -198,6 +170,33 @@
 
             </div><!-- /col2 -->
 
+
+            <!-- col3 -->
+            <div class="col-sm-8 fh hidden" id="inCallPane">
+
+              <div class="row top-row">
+                <div class="col-sm-8 col-xs-10">
+                  <h3 id="inCallOther">Video Call</h3>
+                </div>
+                <div class="col-sm-4 col-xs-2">
+                  <div class="pull-right">
+                    <button class="btn btn-danger" id="hangup">
+                      <span class="glyphicon glyphicon-earphone" aria-hidden="true"></span>
+                      <span class="hidden-xs">Hangup</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row" id="videoContainer">
+                <!-- Video elements can be specified in html or done dynamically in JS -->
+                <!-- video id="localVideo" class="local" autoplay muted></video -->
+                <!-- video id="remoteVideo" class="remote" autoplay></video -->
+              </div>
+
+            </div><!-- /col3 -->
+
+
           </div><!-- /.row -->
 
 
@@ -205,15 +204,16 @@
 
     </div><!-- /.container -->
 
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
+    <!-- Bootstrap core JavaScript -->
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <!-- Enable TemaSys WebRTC plugin to add WebRTC support in Safari and IE -->
+    <!-- <script src="//cdn.temasys.com.sg/adapterjs/0.10.x/adapter.debug.js"></script> -->
     <!-- Include Bit6 SDK, only for the web app not Cordova! -->
     <script src="js/bit6.min.js"></script>
     <!-- Include Cordova js file for Cordova app -->
     <!-- <script src="cordova.js"></script> -->
+    <!-- app js code -->
     <script src="js/demo.js"></script>
     <script src="js/index.js"></script>
   </body>
