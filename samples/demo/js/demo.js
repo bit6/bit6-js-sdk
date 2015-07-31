@@ -7,9 +7,7 @@ function initApp(b6) {
     var disableAudio = false;
 
     var currentChatUri = null;
-    var lastTypingSent = 0;
     var typingLabelTimer = 0;
-
 
     // Incoming call from another user
     b6.on('incomingCall', function(c) {
@@ -31,6 +29,11 @@ function initApp(b6) {
     b6.on('message', function(m, op) {
         //console.log('onMsg', m);
         onMessageChange(m, op);
+    });
+
+    // A group has changed
+    b6.on('group', function(g, op) {
+        console.log('onGrp', op, g);
     });
 
     // Got a real-time notification
@@ -243,6 +246,8 @@ function initApp(b6) {
                 if (m.incoming()) {
                     b6.markMessageAsRead(m);
                 }
+                // If we had user 'typing' indicator - clear it
+                showUserTyping(false);
             }
         }
 
@@ -401,7 +406,6 @@ function initApp(b6) {
         var content = $('#msgText').val();
         var other = currentChatUri;
         if (!content || !other) return
-        lastTypingSent = 0;
         $('#msgText').val('');
         console.log ('Send message to=', other, 'content=', content);
         var m = {
@@ -648,11 +652,7 @@ function initApp(b6) {
     // Key down event in compose input field
     $('#msgText').keydown(function() {
         console.log('keydown in compose');
-        var now = Date.now();
-        if (now - lastTypingSent > 7000) {
-            lastTypingSent = now;
-            b6.sendTypingNotification(currentChatUri);
-        }
+        b6.sendTypingNotification(currentChatUri);
     });
 
     // Send message when user hits Enter
