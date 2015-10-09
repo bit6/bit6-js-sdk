@@ -216,16 +216,55 @@ function initApp(b6) {
             div = $('<div class="msg ' + cssClass + '" />').attr('id', divId.substring(1));
 
             // This message has an attachment
-            if (m.data) {
-                // TODO: handle location and audio clips properly
+            if (m.data && m.data.type) {
                 var attachType = m.data.type;
-                var thumbImg = m.data.thumb;
                 var href = m.data.attach;
-                div.append('<a class="thumb" href="' + href + '" target="_new"><img src="' + thumbImg + '" /></a>');
+                // We have a thumbnail and this is not an audio file
+                if (m.data.thumb && attachType.indexOf('audio/') < 0) {
+                    var thumbImg = m.data.thumb;
+                    div.append('<a class="thumb" href="' + href + '" target="_new"><img src="' + thumbImg + '" /></a>');
+                }
+                // Show Play button
+                else {
+                    var btn = $('<button class="btn btn-info"/>')
+                        .text('Play')
+                        .data('src', href)
+                        .click(function() {
+                            var src = $(this).data('src');
+                            var audio = new Audio(src);
+                            audio.play();
+                        });
+                    div.append(btn);
+                }
             }
+            // Message content to show
+            var text = m.content;
+
+            // This is a call history item
+            if (m.isCall()) {
+                var ch = m.channel();
+                var r = [];
+                if (ch & bit6.Message.AUDIO) {
+                    r.push('Audio');
+                }
+                if (ch & bit6.Message.VIDEO) {
+                    r.push('Video');
+                }
+                if (ch & bit6.Message.DATA) {
+                    r.push('Data');
+                }
+                text = r.join(' + ') + ' Call'
+                if (m.data && m.data.duration) {
+                    var dur = m.data.duration;
+                    var mins = Math.floor(dur / 60);
+                    var secs = dur % 60;
+                    text += ' - ' + (mins ? mins + 'm ' : '') + secs + 's';
+                }
+            }
+
             // Text content
-            if (m.content) {
-                div.append('<span>' + m.content + '</span>');
+            if (text) {
+                div.append('<span>' + text + '</span>');
             }
             // Timestamp
             div.append('<i />');
@@ -287,6 +326,19 @@ function initApp(b6) {
     function getMessageStatusString(m) {
         // Is this an outgoing message?
         if (!m.incoming()) {
+            // Is the message being sent?
+            if (m.status() == bit6.Message.SENDING) {
+                // Do we have upload progress info?
+                if (m.progress && m.total) {
+                    var s = '' + m.progress;
+                    // We know total size of the message attachments
+                    if (m.total > 0) {
+                        var perc = Math.floor(m.progress * 100 / m.total);
+                        s = perc + '% of ' + ( m.total < 1024 ? m.total : (m.total >> 10) + 'k' );
+                    }
+                    return s;
+                }
+            }
             // Multiple destinations
             if (m.others) {
                 var d = [];
@@ -303,7 +355,6 @@ function initApp(b6) {
                 }
             }
         }
-
         return m.getStatusString();
     }
 
@@ -403,18 +454,56 @@ function initApp(b6) {
 
     // I wonder what this function does...
     function sendMessage() {
-        var content = $('#msgText').val();
-        var other = currentChatUri;
-        if (!content || !other) return
+        var text = $('#msgText').val();
+        var dest = currentChatUri;
+        if (!text || !dest) return;
         $('#msgText').val('');
-        console.log ('Send message to=', other, 'content=', content);
-        var m = {
-            'other': other,
-            'content': content
-        };
-        b6.sendMessage(m, function(err, result) {
-            console.log('sendMessage result=', result, 'err=', err);
-        });
+        console.log ('Send message to=', dest, 'content=', text);
+        b6.compose(dest)
+            .text(text)
+            .send(function(err, m) {
+                console.log('sendMessage result=', m, 'err=', err);
+            });
+    }
+
+    // User selected file(s) to attach to a message
+    function handleAttachFiles(files) {
+        // files is a FileList of File objects. List some properties.
+        for (var i = 0, f; f = files[i]; i++) {
+            console.log(escape(f.name) + ' - selected - type: ' + (f.type || 'n/a') + ' size: ' + f.size + 'b');
+            handleAttachFile(f);
+        }
+    }
+
+    // Send each attached file as a separate message
+    function handleAttachFile(f) {
+        var dest = currentChatUri;
+        if (!f || !dest) return;
+        console.log ('Send attachment to=', dest, 'file=', f);
+        b6.compose(dest)
+            .attach(f)
+            .send(function(err, m) {
+                console.log('sendMessage attach result=', m, 'err=', err);
+            });
+    }
+
+    // User dropped files in the chat messages area
+    function handleAttachFilesDrop(e) {
+        var evt = e.originalEvent;
+        evt.stopPropagation();
+        evt.preventDefault();
+        // FileList object
+        var files = evt.dataTransfer.files;
+        handleAttachFiles(files);
+    }
+
+    // User is dragging files over the chat messages area
+    function handleAttachFilesDragOver(e) {
+        var evt = e.originalEvent;
+        evt.stopPropagation();
+        evt.preventDefault();
+        // Explicitly show this is a copy
+        evt.dataTransfer.dropEffect = 'copy';
     }
 
     // Start an outgoing call
@@ -621,6 +710,19 @@ function initApp(b6) {
         sendMessage();
     });
 
+    // Selected attachment file
+    $('#attachFile').change(function(evt) {
+        console.log('Attach clicked');
+        var files = evt.target.files; // FileList object
+        handleAttachFiles(files);
+    });
+
+    // Files to attach can be dropped in the messages area
+    $('#detailPane')
+        .on('dragover', handleAttachFilesDragOver)
+        .on('drop', handleAttachFilesDrop);
+
+
     // Delete a Conversation
     $('#deleteChatButton').click(function() {
         console.log('Delete current conversation');
@@ -663,6 +765,26 @@ function initApp(b6) {
             sendMessage();
         }
     });
+
+    // Paste event. If a file is pasted - send it as an attachment
+    $('#msgText').on('paste', function(e) {
+        var files = [];
+        var evt = e.originalEvent;
+        var clipboardData = evt.clipboardData || {};
+        var items = clipboardData.items || [];
+        for (var i = 0; i < items.length; i++) {
+            var f = items[i].getAsFile();
+            if (f) {
+                files.push(f);
+            }
+        }
+        if (files.length > 0) {
+            evt.stopPropagation();
+            evt.preventDefault();
+            handleAttachFiles(files);
+        }
+    });
+
 
     // 'Answer Incoming Call' click
     $('#answer').click(function() {

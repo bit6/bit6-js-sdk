@@ -3,12 +3,11 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
     <meta name="description" content="Bit6 Web Demo">
     <meta name="author" content="Bit6">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
 
-    <title>Bit6 Demo 0.9.3</title>
+    <title>Bit6 Demo 0.9.5</title>
 
     <!-- Bootstrap core CSS -->
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
@@ -158,6 +157,12 @@
                 </div>
                 <div class="col-sm-8">
                   <div class="input-group">
+                    <span class="input-group-btn">
+                      <span class="btn btn-default btn-file">
+                        <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>
+                        <input type="file" id="attachFile" />
+                      </span>
+                    </span>
                     <input type="text" class="form-control" id="msgText" placeholder="Type message">
                     <span class="input-group-btn">
                       <button class="btn btn-primary" type="button" id="sendMsgButton">
@@ -208,9 +213,17 @@
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <!-- Enable TemaSys WebRTC plugin to add WebRTC support in Safari and IE -->
-    <!-- <script src="//cdn.temasys.com.sg/adapterjs/0.10.x/adapter.debug.js"></script> -->
+    <!--
+    <script src="//cdn.temasys.com.sg/adapterjs/0.12.x/adapter.debug.js"></script>
+    <script>
+      // Do not show plugin banner if no plugin to download
+      if (!AdapterJS.WebRTCPlugin.pluginInfo.downloadLink) {
+        AdapterJS.options.hidePluginInstallPrompt = true;
+      }
+    </script>
+    -->
     <!-- Include Bit6 SDK, only for the web app not Cordova! -->
-    <script src="js/bit6.min.js"></script>
+    <script src="components/bit6/bit6.js"></script>
     <!-- Include Cordova js file for Cordova app -->
     <!-- <script src="cordova.js"></script> -->
     <!-- app js code -->
