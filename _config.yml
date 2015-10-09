@@ -1,6 +1,6 @@
 ---
 title: 'Bit6 JS SDK'
-version: '0.9.3'
+version: '0.9.5'
 exclude: ['README.markdown']
 permalink: ':title'
 highlighter: 'pygments'

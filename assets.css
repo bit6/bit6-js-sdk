@@ -469,7 +469,7 @@ code {
 #sidebar {
   background: #191919;
   color: #fff;
-  float: left;  
+  float: left;
   height: 100%;
   overflow: auto;
   position: fixed;
@@ -705,6 +705,11 @@ div.highlight pre {
   -webkit-border-radius: 2px;
   box-sizing: border-box;
 }
+
+#content ul > li {
+  line-height: 160%;
+}
+
 
 .hll { background-color: #ffffcc }
  /*{ background: #f0f3f3; }*/

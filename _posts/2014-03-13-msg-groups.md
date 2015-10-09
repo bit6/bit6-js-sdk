@@ -6,7 +6,7 @@ title: 'Groups'
 ### Get a Group
 
 ```js
-g = b6.getGroup(id);
+var g = b6.getGroup(id);
 ```
 
 ### Create a Group
@@ -15,13 +15,13 @@ Create a new group. The current user will become the group administrator.
 
 ```js
 // Group information - meta data, permissions
-var info = {
+var opts = {
   meta: {
     title: 'Hello World'
   }
 };
 // Create the group
-b6.createGroup(info, function(err, g) {
+b6.createGroup(opts, function(err, g) {
   if (err) {
     console.log('error', err);
   }
