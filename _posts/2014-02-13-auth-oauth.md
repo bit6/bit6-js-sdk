@@ -20,14 +20,14 @@ b6.session.getAuthInfo(function(err, infos) {
 
 Sample response with OAuth2 configuration for Facebook and Google Account apps.
 
-```js
+```json
 {
-  'facebook': {
-    'client_id': '1234567890'
+  "facebook": {
+    "client_id": "1234567890"
   },
-  'google': {
-    'client_id': 'abcxyz'
-  },
+  "google": {
+    "client_id": "abcxyz"
+  }
 }
 
 ```
