@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Bit6 Web Demo">
+    <meta name="author" content="Bit6">
+    <title>Bit6 with Telerik auth</title>
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+
+  <body>
+
+    <div class="container">
+
+        <!-- Welcome page -->
+        <div id="welcome">
+          <div class="intro">
+            <h1>Bit6 with Telerik auth</h1>
+            <p class="lead">Authenticate as a Telerik user</p>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-offset-3 col-md-offset-4 col-sm-6 col-md-4">
+
+              <div class="bg-danger" id="authError"></div>
+
+              <form role="form">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="authUsername" placeholder="Username">
+                </div>
+                <div class="form-group">
+                  <input type="password" class="form-control" id="authPassword" placeholder="Password">
+                </div>
+                <button class="btn btn-primary" id="loginButton">Login</button>
+                <button class="btn btn-info" id="signupButton">Sign Up</button>
+              </form>
+
+            </div>
+          </div><!-- /.row -->
+
+          <div style="margin-top: 20px">
+            <p>Bit6 auth result
+            <pre id="authResult"></pre>
+          </div>
+
+        </div><!-- /#welcome -->
+
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="//bs-static.cdn.telerik.com/latest/everlive.all.js"></script>
+    <script src="../common/bit6.min.js"></script>
+    <script>
+
+      // Create a new user in Telerik Backend Services
+      function signup(el, username, password, cb) {
+        el.Users.register(username, password, {},
+          function(data) {
+              console.log(data.result);
+              // TODO: do we need to login after creating a user?
+              login(el, username, password, cb);
+              //getBit6AuthParams(el, cb);
+          },
+          cb
+        );
+      }
+
+      // Login as an existing user
+      function login(el, username, password, cb) {
+        el.authentication.login(username, password,
+          function(data) {
+              console.log(data.result);
+              getBit6AuthParams(el, cb);
+          },
+          cb
+        );
+      }
+
+      // Telerik auth complete, get Bit6 user auth params
+      // from the clould function
+      function getBit6AuthParams(el, cb) {
+        // Call the cloud function to get Bit6 auth params
+        var opts = {
+          endpoint: 'functions/bit6_auth',
+          success: function(a) {
+            console.log('bit6_auth resp', a);
+            var token = a.result;
+            // Did we get a successful response from the cloud function?
+            if (token) {
+              cb(null, token);
+            }
+            else {
+              cb('Cannot start Bit6 auth: ' + JSON.stringify(a));
+            }
+          }
+        };
+        el.request(opts).send();
+      }
+
+
+      $(function() {
+
+        // Prod env
+        var apikey = '4oap-2lvnm';
+        var env = 'prod';
+
+        // Determine Bit6 key and env based on browser url
+        var t = window.location.href;
+        // Dev env
+        if (t.indexOf('dev') > 0) {
+          apikey = '3y9-26ufj';
+          env = 'dev';
+        }
+        // Local env
+        else if (t.indexOf('localhost') > 0) {
+          apikey = '3y9-26ufj';
+          env = 'local';
+        }
+
+        // Init Bit6 SDK
+        var bx = new bit6.Client({apikey: apikey, env: env});
+
+        // Listen to the auth complete event
+        bx.session.on('auth', function() {
+          // Show Bit6 auth data
+          $('#authResult').html(JSON.stringify(bx.session.save(), null, 2));
+        });
+
+        // Initialize Telerik SDK
+        var el = new Everlive({
+            apiKey: 'orHSoM1dxMK1Ynxn',
+            scheme: 'https'
+        });
+
+        // Handle a click on a login or signup button
+        function authClicked(isNewUser) {
+          // Call signup or login function
+          var fn = isNewUser ? signup : login;
+          var username = $('#authUsername').val();
+          var pass = $('#authPassword').val();
+          fn(el, username, pass, function(err, token) {
+            if (err) {
+              console.log(err);
+            }
+            else {
+              // Pass the auth info to Bit6 to complete the authentication
+              bx.session.external(token, function(err) {
+                console.log('Bit6 auth finished err: ', err);
+              });
+            }
+          });
+          return false;
+        }
+
+        $('#signupButton').click(function() {return authClicked(true);});
+        $('#loginButton').click(function() {return authClicked(false);});
+
+        // For console debug access
+        window.bx = bx;
+        window.el = el;
+
+      });
+
+    </script>
+  </body>
+</html>

@@ -1,0 +1,287 @@
+body {
+  padding-top: 50px;
+}
+
+html, body, .fh {
+  height: 100%;
+}
+
+.intro {
+  padding: 20px 15px;
+  text-align: center;
+}
+
+.bg-danger > p {
+  padding: 10px;
+}
+
+.btn-file {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-file input[type=file] {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 100%;
+  min-height: 100%;
+  font-size: 100px;
+  text-align: right;
+  filter: alpha(opacity=0);
+  opacity: 0;
+  outline: none;
+  background: white;
+  cursor: inherit;
+  display: block;
+}
+
+#chatListRow, #msgListRow {
+  position: absolute;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  top: 75px;
+  margin: 0px;
+}
+
+#msgListRow {
+  bottom: 55px;
+}
+
+#chatList, #msgList {
+  position: relative;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.chats > div {
+  padding: 6px 6px;
+  color: #666;
+  border: 1px solid transparent;
+  clear: both;
+  cursor: pointer;
+}
+
+.chats > div:hover {
+  border: 1px solid #eee;
+}
+
+.chats > div.selected {
+  background-color: #f0f0f0;
+}
+
+.chats strong {
+  display: block;
+  font-weight: normal;
+  font-size: 1.3em;
+  margin-bottom: 4px;
+  color: #0F76C1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.chats span {
+  display: block;
+  float: left;
+  padding-left: 10px;
+  font-size: 0.9em;
+  color: #aaa;
+}
+
+.chats em {
+  display: block;
+  text-align: right;
+  font-size: 0.8em;
+  color: #ccc;
+}
+
+.chats strong > b {
+  display: block;
+  float: right;
+  background-color: #0F76C1;
+  font-size: 0.6em;
+  color: #fff;
+  padding: 2px 4px;
+  margin-top: 2px;
+  /*font-weight: normal;*/
+}
+
+.top-row {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.top-row h3 {
+  margin-top: 5px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+#chatButtons > button {
+  margin-right: 4px;
+}
+
+#newChatDropdown .dropdown-menu {
+  padding: 15px;
+  width: 250px;
+}
+
+#backToList {
+  margin-right: 5px;
+  display: none;
+}
+
+#detailPane, #inCallPane {
+  position: relative;
+}
+
+#msgOtherTyping {
+  padding: 6px;
+}
+
+#msgComposeRow {
+  background-color: #f5f5f5;
+  margin: 0px;
+  padding: 10px 0;
+  position: absolute;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+}
+
+.msgs > div {
+  width: 50%;
+  padding: 10px;
+  border: 1px transparent solid;
+  position: relative;
+  margin: 5px 10px;
+}
+
+.msgs > div.me {
+  text-align: right;
+  border-color: #ddd;
+  float: right;
+  clear: both;
+}
+
+.msgs > div.other {
+  background-color: #f5f5f5;
+  text-align: left;
+  border-color: #ddd;
+  float: left;
+  clear: both;
+}
+
+.msgs span {
+  display: block;
+}
+
+.msgs em, .msgs i {
+  display: block;
+  font-size: 0.8em;
+  color: #ccc;
+}
+
+.msgs > div.me i {
+  float: left;
+}
+
+.msgs > div.other i {
+  float: right;
+}
+
+a.thumb {
+  display: block;
+  text-align: center;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+
+a.thumb img {
+  max-width: 320px;
+  max-height: 320px;
+  /* width: 100%; */
+  height: 320px;
+}
+
+#incomingCall {
+  position: absolute;
+  top: 60px;
+  z-index: 100;
+  left: auto;
+  right: auto;
+  width: 300px;
+}
+
+#videoContainer {
+  position: absolute;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  top: 80px;
+  margin: 0px;
+  text-align: center;
+}
+
+#videoContainer.simple > .remote {
+  max-width: 100%;
+  max-height: 100%;
+  width: 100%;
+}
+
+#videoContainer.simple > .local {
+  max-width: 30%;
+  max-height: 30%;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  border-left: 1px solid #fff;
+  border-bottom: 1px solid #fff;
+  width: auto;
+  height: auto;
+}
+
+#videoContainer.grid > video {
+  max-width: 50%;
+  max-height: 50%;
+  padding: 0 4px 4px 0;
+}
+
+
+/*
+ 768px - xs devices, 992px - medium devices
+*/
+@media only screen and (max-width : 768px) {
+  /* Adjust top row margins on small screen */
+  .top-row {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  /* On small screen by default DetailPane is hidden */
+  #detailPane {
+    display: none;
+  }
+
+  /* When in detail mode, we hide ListPane */
+  body.detail #listPane {
+    display: none;
+  }
+
+  /* Also hide top navbar */
+  body.detail .navbar {
+    display: none;
+  }
+
+  body.detail {
+    padding-top: 0px;
+  }
+
+  /* ... and show DetailPane */
+  body.detail #detailPane {
+    display: block;
+  }
+}

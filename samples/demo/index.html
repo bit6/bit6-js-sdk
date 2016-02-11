@@ -7,12 +7,12 @@
     <meta name="description" content="Bit6 Web Demo">
     <meta name="author" content="Bit6">
 
-    <title>Bit6 Demo 0.9.5</title>
+    <title>Bit6 Demo 0.9.6</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="//netdna.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
     <!-- Custom styles -->
-    <link href="css/demo.css" rel="stylesheet">
+    <link href="demo.css" rel="stylesheet">
   </head>
 
   <body>
@@ -83,7 +83,8 @@
             <h4 id="incomingCallFrom">John is calling...</h4>
             <p>Do you dare to answer this call?</p>
             <p>
-              <button type="button" class="btn btn-success" id="answer">Answer</button>
+              <button type="button" class="btn btn-success" id="answerVideo">Video</button>
+              <button type="button" class="btn btn-success" id="answerAudio">Audio</button>
               <button type="button" class="btn btn-danger" id="reject">Reject</button>
             </p>
           </div>
@@ -95,24 +96,47 @@
             <div class="col-sm-4 fh" id="listPane">
 
               <div class="row top-row">
-                <div class="col-sm-12 col-xs-7">
+
+                <div class="col-xs-6">
+                  <h3>Chats</h3>
+                </div>
+
+                <div class="col-xs-6">
                   <!-- New Chat dropdown -->
                   <ul class="nav nav-pills pull-right">
                     <li class="dropdown" id="newChatDropdown">
                       <a id="drop1" role="button" data-toggle="dropdown" href="#">New
                           <b class="caret"></b></a>
-                      <form id="newChatMenu" class="dropdown-menu" role="menu" aria-labelledby="drop1">
-                        <input type="text" class="form-control" id="newChatUsername" placeholder="Enter username">
-                        <button class="btn btn-primary" type="submit" id="newChatStart">Start</button>
-                      </form>
+                      <div class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="drop1">
+                        <h4>Direct Chat</h4>
+                        <div class="input-group">
+                          <input type="text" class="form-control" id="newChatUsername" placeholder="Username" autocomplete="off">
+                          <span class="input-group-btn">
+                            <button class="btn btn-primary" type="button" id="newChatStart">
+                              <span class="glyphicon glyphicon-send" aria-hidden="true"></span>
+                            </button>
+                          </span>
+                        </div><!-- /input-group -->
+
+                        <h4>New Group</h4>
+                        <div class="input-group">
+                          <input type="text" class="form-control" id="newGroupTitle" placeholder="Group title" autocomplete="off">
+                          <span class="input-group-btn">
+                            <button class="btn btn-primary" type="button" id="newGroupCreate">
+                              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                            </button>
+                          </span>
+                        </div><!-- /input-group -->
+
+                      </div>
                     </li>
                     </li>
                   </ul> <!-- /pills -->
-                  <h3>Chats</h3>
                 </div>
+
               </div>
 
-              <div class="row">
+              <div class="row" id="chatListRow">
                 <div class="chats" id="chatList"></div>
               </div>
 
@@ -127,21 +151,30 @@
                   <button class="btn btn-default pull-left visible-xs" id="backToList">
                     <span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
                   </button>
-                  <h3 id="msgOtherName" style=""></h3>
+                  <h3 id="chatTitle"></h3>
                 </div>
                 <div class="col-sm-7 col-xs-7">
                   <div id="chatButtons" class="pull-right">
-                    <button class="btn btn-info" id="voiceCallButton">
+                    <button class="btn btn-info" id="audioCallButton">
                       <span class="glyphicon glyphicon-earphone" aria-hidden="true"></span>
-                      <span class="hidden-xs">Voice</span>
+                      <span class="hidden-sm hidden-xs">Audio</span>
                     </button>
                     <button class="btn btn-info" id="videoCallButton">
                       <span class="glyphicon glyphicon-facetime-video" aria-hidden="true"></span>
-                      <span class="hidden-xs">Video</span>
+                      <span class="hidden-sm hidden-xs">Video</span>
                     </button>
-                    <button class="btn btn-default" id="deleteChatButton">
-                      <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                    <button class="btn btn-info hidden-xs" id="screenCallButton">
+                      <span class="glyphicon glyphicon-share" aria-hidden="true"></span>
+                      <span class="hidden-sm hidden-xs">Screen</span>
                     </button>
+                    <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                      <span class="glyphicon glyphicon-option-vertical" aria-hidden="true"></span>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                      <li><a href="#" id="groupInfoButton">Group details</a></li>
+                      <li role="separator" class="divider"></li>
+                      <li><a href="#" id="deleteChatButton">Delete messages</a></li>
+                    </ul>
                   </div>
                 </div>
               </div>
@@ -180,24 +213,28 @@
             <div class="col-sm-8 fh hidden" id="inCallPane">
 
               <div class="row top-row">
-                <div class="col-sm-8 col-xs-10">
+                <div class="col-sm-7 col-xs-8">
                   <h3 id="inCallOther">Video Call</h3>
                 </div>
-                <div class="col-sm-4 col-xs-2">
+                <div class="col-sm-5 col-xs-4">
                   <div class="pull-right">
+                    <button class="btn btn-default" id="incallVideo" data-toggle="button" autocomplete="off">
+                      <span class="glyphicon glyphicon-facetime-video" aria-hidden="true"></span>
+                      <span class="visible-lg-inline">Video</span>
+                    </button>
+                    <button class="btn btn-default hidden-xs" id="incallScreen" data-toggle="button" autocomplete="off">
+                      <span class="glyphicon glyphicon-share" aria-hidden="true"></span>
+                      <span class="visible-lg-inline">Screen</span>
+                    </button>
                     <button class="btn btn-danger" id="hangup">
                       <span class="glyphicon glyphicon-earphone" aria-hidden="true"></span>
-                      <span class="hidden-xs">Hangup</span>
+                      <span class="hidden-xs hidden-sm">Hangup</span>
                     </button>
                   </div>
                 </div>
               </div>
 
-              <div class="row" id="videoContainer">
-                <!-- Video elements can be specified in html or done dynamically in JS -->
-                <!-- video id="localVideo" class="local" autoplay muted></video -->
-                <!-- video id="remoteVideo" class="remote" autoplay></video -->
-              </div>
+              <div class="row" id="videoContainer"></div>
 
             </div><!-- /col3 -->
 
@@ -209,25 +246,95 @@
 
     </div><!-- /.container -->
 
+    <div class="modal fade" id="groupInfoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="groupInfoTitle">Group info</h4>
+          </div>
+
+          <div class="modal-body">
+
+            <div class="bs-example bs-example-tabs" data-example-id="togglable-tabs">
+              <ul class="nav nav-tabs" role="tablist" style="margin-bottom: 15px">
+                <li role="presentation" class="active">
+                  <a href="#ggen" role="tab" id="ggen-tab" data-toggle="tab" aria-controls="ggen" aria-expanded="true">General</a>
+                </li>
+                <li role="presentation">
+                  <a href="#gmem" role="tab" id="gmem-tab" data-toggle="tab" aria-controls="gmem" aria-expanded="false">Members</a>
+                </li>
+                <li role="presentation">
+                  <a href="#gper" role="tab" id="gper-tab" data-toggle="tab" aria-controls="gper" aria-expanded="false">Permissions</a>
+                </li>
+              </ul>
+              <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="ggen" aria-labelledby="ggen-tab">
+                  <h4>General</h4>
+                  <div>ID: <span id="groupInfoId"></span></div>
+                  <div>Me: <span id="groupInfoMe"></span></div>
+                  <h4>Meta</h4>
+                  <pre id="groupInfoMetaRaw"></pre>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="gmem" aria-labelledby="gmem-tab">
+                  <h4>Members
+                    <a class="btn btn-link" data-toggle="collapse" href="#groupInfoMembersRaw">Show JSON</a>
+                  </h4>
+
+                  <pre id="groupInfoMembersRaw" class="collapse"></pre>
+
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>User</th>
+                        <th>Role</th>
+                        <th>Presence</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody id="groupInfoMembers">
+                      <!-- <tr><td>usr:alex</td><td>user</td><td><a href="#">kick</a></td></tr> -->
+                    </tbody>
+                  </table>
+
+                  <div class="form-inline">
+                    <input type="text" class="form-control" id="newMemberUsername" placeholder="New member" autocomplete="off">
+                    <button class="btn btn-primary" type="button" id="newMemberButton">Invite</button>
+                  </div>
+
+                </div>
+                <div role="tabpanel" class="tab-pane" id="gper" aria-labelledby="gper-tab">
+                  <h4>Permissions</h4>
+                  <pre id="groupInfoPermsRaw"></pre>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+
     <!-- Bootstrap core JavaScript -->
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-    <script src="//netdna.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <!-- Enable TemaSys WebRTC plugin to add WebRTC support in Safari and IE -->
-    <!--
-    <script src="//cdn.temasys.com.sg/adapterjs/0.12.x/adapter.debug.js"></script>
+    <script src="//cdn.temasys.com.sg/adapterjs/0.13.x/adapter.debug.js"></script>
     <script>
       // Do not show plugin banner if no plugin to download
       if (!AdapterJS.WebRTCPlugin.pluginInfo.downloadLink) {
         AdapterJS.options.hidePluginInstallPrompt = true;
       }
     </script>
-    -->
-    <!-- Include Bit6 SDK, only for the web app not Cordova! -->
-    <script src="components/bit6/bit6.js"></script>
     <!-- Include Cordova js file for Cordova app -->
     <!-- <script src="cordova.js"></script> -->
+    <!-- Include Bit6 SDK, only for the web app not Cordova! -->
+    <script src="../common/bit6.min.js"></script>
     <!-- app js code -->
-    <script src="js/demo.js"></script>
-    <script src="js/index.js"></script>
+    <script src="../common/index.js"></script>
+    <script src="demo.js"></script>
   </body>
 </html>
