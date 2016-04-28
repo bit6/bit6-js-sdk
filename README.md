@@ -6,7 +6,8 @@ Bit6 JS SDK
 Bit6 is a real-time, cloud-based communications-as-a-service platform that allows mobile and web application developers to quickly and easily add voice/video calling, texting, and multimedia messaging capabilities into their apps.
 
 ### Documentation
-* [Getting Started](https://bit6.github.io/bit6-js-sdk/)
+* [Quick Start](http://docs.bit6.com/start/web-js/)
+* [Developer Guide](http://docs.bit6.com/guides/js/)
 
 ### Live Demos
 We have two live demos that you can try right now:
