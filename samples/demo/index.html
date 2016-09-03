@@ -7,10 +7,10 @@
     <meta name="description" content="Bit6 Web Demo">
     <meta name="author" content="Bit6">
 
-    <title>Bit6 Demo 0.9.7</title>
+    <title>Bit6 Demo 0.9.9</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="//netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
     <!-- Custom styles -->
     <link href="demo.css" rel="stylesheet">
   </head>
@@ -81,7 +81,7 @@
           <!-- Incoming Call alert -->
           <div class="alert alert-warning fade in" id="incomingCall">
             <h4 id="incomingCallFrom">John is calling...</h4>
-            <p>Do you dare to answer this call?</p>
+            <p id="incomingCallInfo">Do you dare to answer this call?</p>
             <p>
               <button type="button" class="btn btn-success" id="answerVideo">Video</button>
               <button type="button" class="btn btn-success" id="answerAudio">Audio</button>
@@ -155,22 +155,34 @@
                 </div>
                 <div class="col-sm-7 col-xs-7">
                   <div id="chatButtons" class="pull-right">
+                    <!-- Audio Call -->
                     <button class="btn btn-info" id="audioCallButton">
                       <span class="glyphicon glyphicon-earphone" aria-hidden="true"></span>
                       <span class="hidden-sm hidden-xs">Audio</span>
                     </button>
-                    <button class="btn btn-info" id="videoCallButton">
-                      <span class="glyphicon glyphicon-facetime-video" aria-hidden="true"></span>
-                      <span class="hidden-sm hidden-xs">Video</span>
-                    </button>
-                    <button class="btn btn-info hidden-xs" id="screenCallButton">
-                      <span class="glyphicon glyphicon-share" aria-hidden="true"></span>
-                      <span class="hidden-sm hidden-xs">Screen</span>
-                    </button>
+                    <!-- Video Call Options -->
+                    <div class="btn-group" >
+                      <button type="button" class="btn btn-info" id="videoCallDefault" >
+                        <span class="glyphicon glyphicon-facetime-video" aria-hidden="true"></span>
+                        <span class="hidden-sm hidden-xs">Video</span>
+                      </button>
+                      <button class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="caret"></span>
+                        <span class="sr-only"></span>
+                      </button>
+                      <ul class="dropdown-menu dropdown-menu-right">
+                        <li><a href="#" id="videoCallFrontCam">Front Camera</a></li>
+                        <li><a href="#" id="videoCallBackCam">Back Camera</a></li>
+                      </ul>
+                    </div>
+                    <!-- Conversation options -->
                     <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
                       <span class="glyphicon glyphicon-option-vertical" aria-hidden="true"></span>
                     </button>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                    <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                      <li><a href="#" id="mediaModeButton">Media mode: P2P</a></li>
+                      <li><a href="#" id="screenCallButton">Share screen</a></li>
+                      <li role="separator" class="divider"></li>
                       <li><a href="#" id="groupInfoButton">Group details</a></li>
                       <li role="separator" class="divider"></li>
                       <li><a href="#" id="deleteChatButton">Delete messages</a></li>
@@ -213,18 +225,20 @@
             <div class="col-sm-8 fh hidden" id="inCallPane">
 
               <div class="row top-row">
-                <div class="col-sm-7 col-xs-8">
+                <div class="col-sm-7 col-xs-7">
                   <h3 id="inCallOther">Video Call</h3>
                 </div>
-                <div class="col-sm-5 col-xs-4">
+                <div class="col-sm-5 col-xs-5">
                   <div class="pull-right">
+                    <button class="btn btn-default" id="incallRecord" data-toggle="button" autocomplete="off">
+                      <span class="glyphicon glyphicon-record" aria-hidden="true"></span>
+                      <span class="visible-lg-inline">Record</span>
+                    </button>
                     <button class="btn btn-default" id="incallVideo" data-toggle="button" autocomplete="off">
                       <span class="glyphicon glyphicon-facetime-video" aria-hidden="true"></span>
-                      <span class="visible-lg-inline">Video</span>
                     </button>
                     <button class="btn btn-default hidden-xs" id="incallScreen" data-toggle="button" autocomplete="off">
                       <span class="glyphicon glyphicon-share" aria-hidden="true"></span>
-                      <span class="visible-lg-inline">Screen</span>
                     </button>
                     <button class="btn btn-danger" id="hangup">
                       <span class="glyphicon glyphicon-earphone" aria-hidden="true"></span>
@@ -319,9 +333,12 @@
 
 
     <!-- Bootstrap core JavaScript -->
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
-    <script src="//netdna.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <!-- Latest WebRTC adapter.js shim -->
+    <script src="//webrtc.github.io/adapter/adapter-latest.js"></script>
     <!-- Enable TemaSys WebRTC plugin to add WebRTC support in Safari and IE -->
+    <!--
     <script src="//cdn.temasys.com.sg/adapterjs/0.13.x/adapter.debug.js"></script>
     <script>
       // Do not show plugin banner if no plugin to download
@@ -329,6 +346,7 @@
         AdapterJS.options.hidePluginInstallPrompt = true;
       }
     </script>
+    -->
     <!-- Include Cordova js file for Cordova app -->
     <!-- <script src="cordova.js"></script> -->
     <!-- Include Bit6 SDK, only for the web app not Cordova! -->
