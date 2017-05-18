@@ -216,6 +216,12 @@ a.thumb img {
   width: 300px;
 }
 
+.local {
+  transform: rotateY(180deg);
+  -webkit-transform:rotateY(180deg);
+  -moz-transform:rotateY(180deg);
+}
+
 #videoContainer {
   position: absolute;
   left: 0px;
@@ -247,7 +253,7 @@ a.thumb img {
 #videoContainer.grid > video {
   max-width: 50%;
   max-height: 50%;
-  padding: 0 4px 4px 0;
+  padding: 2px;
 }
 
 

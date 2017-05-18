@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<!--
+ *  Copyright (c) 2015 The WebRTC project authors. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree.
+-->
+<html>
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=1, maximum-scale=1">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta id="theme-color" name="theme-color" content="#ffffff">
+  <link href="//netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css" />
+
+</head>
+
+<body>
+
+  <div class="container">
+
+    <div class="row">
+      <div class="col-sm-12">
+        <h3>TURN Service Test</h3>
+      </div>
+    </div>
+
+
+    <div class="row">
+
+      <div class="col-sm-6">
+
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">Bit6 API Credentials</h3>
+          </div>
+          <div class="panel-body">
+              <div class="form-group">
+                <input id="apikey" class="form-control" placeholder="API key"></input>
+              </div>
+              <div class="form-group">
+                <input id="apisecret" class="form-control" placeholder="API secret"></input>
+              </div>
+              <div class="form-group">
+                <select id="env" class="form-control">
+                  <option value="prod">Production</option>
+                  <option value="dev">Development</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin-bottom: 0">
+                <input id="getIceServersButton" class="btn btn-default" value="Get ICE Servers >>"></input>
+              </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="col-sm-6">
+
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">ICE Servers</h3>
+          </div>
+          <div class="panel-body">
+            <div class="form-group">
+              <textarea id="iceServersText" class="form-control" rows="10"
+                autocorrect="off" spellcheck="false"
+                style="font-family: monospace; font-size: 12px; white-space: nowrap">
+              </textarea>
+            </div>
+            <div class="form-group" style="margin-bottom: 0">
+              <select id="dc" class="form-control">
+                <option value="">Auto-select data center</option>
+                <option value="ams">Amsterdam</option>
+                <option value="atl">Atlanta</option>
+                <option value="blr">Bangalore</option>
+                <option value="chi">Chicago</option>
+                <option value="dal">Dallas</option>
+                <option value="jnb">Johannesburg</option>
+                <option value="lon">London</option>
+                <option value="mia">Miami</option>
+                <option value="nyc">New York</option>
+                <option value="hkg">Hong Kong</option>
+                <option value="sfo">San Francisco</option>
+                <option value="sao">Sao Paulo</option>
+                <option value="sea">Seattle</option>
+                <option value="sgp">Singapore</option>
+                <option value="syd">Sydney</option>
+                <option value="tyo">Tokyo</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+
+      <div class="col-sm-6">
+
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">Local Video</h3>
+          </div>
+          <div class="panel-body">
+
+            <video id="localVideo" autoplay muted></video>
+
+            <div style="margin-top: 15px">
+              <button id="startButton" class="btn btn-default">Start</button>
+
+              <label class="checkbox-inline">
+                <input type="checkbox" id="forceTurn" value="true"> Force TURN
+              </label>
+
+              <button id="callButton" class="btn btn-default">Call</button>
+              <button id="hangupButton" class="btn btn-default">Hang Up</button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="col-sm-6">
+
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">Remote Video</h3>
+          </div>
+          <div class="panel-body">
+            <video id="remoteVideo" autoplay></video>
+          </div>
+        </div>
+
+      </div>
+
+
+
+    </div>
+  </div>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="//netdna.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="//webrtc.github.io/adapter/adapter-latest.js"></script>
+  <script src="js/main.js"></script>
+
+</body>
+</html>

@@ -7,7 +7,7 @@
     <meta name="description" content="Bit6 Web Demo">
     <meta name="author" content="Bit6">
 
-    <title>Bit6 Demo 0.9.9</title>
+    <title>Bit6 Demo</title>
 
     <!-- Bootstrap core CSS -->
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
@@ -33,7 +33,7 @@
             <li><a target="_blank" href="http://bit6.com">About</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right hidden" id="loggedInNavbar">
-            <li><a href="#" id="phoneCallButton"><span class="glyphicon glyphicon-phone-alt"></span></a></li>
+            <!-- <li><a href="#" id="phoneCallButton"><span class="glyphicon glyphicon-phone-alt"></span></a></li> -->
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span id="loggedInUser"></span> <b class="caret"></b></a>
               <ul class="dropdown-menu">
@@ -59,7 +59,7 @@
 
               <div class="bg-danger" id="authError"></div>
 
-              <form role="form">
+              <form role="form" onsubmit="return false">
                 <div class="form-group">
                   <input type="text" class="form-control" id="authUsername" placeholder="Username">
                 </div>
@@ -85,7 +85,7 @@
             <p>
               <button type="button" class="btn btn-success" id="answerVideo">Video</button>
               <button type="button" class="btn btn-success" id="answerAudio">Audio</button>
-              <button type="button" class="btn btn-danger" id="reject">Reject</button>
+              <button type="button" class="btn btn-danger" id="decline">Decline</button>
             </p>
           </div>
 
@@ -180,12 +180,12 @@
                       <span class="glyphicon glyphicon-option-vertical" aria-hidden="true"></span>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
-                      <li><a href="#" id="mediaModeButton">Media mode: P2P</a></li>
+                      <!-- <li><a href="#" id="mediaModeButton">Media mode: P2P</a></li>
                       <li><a href="#" id="screenCallButton">Share screen</a></li>
-                      <li role="separator" class="divider"></li>
-                      <li><a href="#" id="groupInfoButton">Group details</a></li>
-                      <li role="separator" class="divider"></li>
-                      <li><a href="#" id="deleteChatButton">Delete messages</a></li>
+                      <li role="separator" class="divider"></li> -->
+                      <li><a href="#" id="groupInfoButton">Details</a></li>
+                      <!-- <li role="separator" class="divider"></li>
+                      <li><a href="#" id="deleteChatButton">Delete messages</a></li> -->
                     </ul>
                   </div>
                 </div>
@@ -230,16 +230,16 @@
                 </div>
                 <div class="col-sm-5 col-xs-5">
                   <div class="pull-right">
-                    <button class="btn btn-default" id="incallRecord" data-toggle="button" autocomplete="off">
+                    <!-- <button class="btn btn-default" id="incallRecord" data-toggle="button" autocomplete="off">
                       <span class="glyphicon glyphicon-record" aria-hidden="true"></span>
                       <span class="visible-lg-inline">Record</span>
-                    </button>
+                    </button> -->
                     <button class="btn btn-default" id="incallVideo" data-toggle="button" autocomplete="off">
                       <span class="glyphicon glyphicon-facetime-video" aria-hidden="true"></span>
                     </button>
-                    <button class="btn btn-default hidden-xs" id="incallScreen" data-toggle="button" autocomplete="off">
+                    <!-- <button class="btn btn-default hidden-xs" id="incallScreen" data-toggle="button" autocomplete="off">
                       <span class="glyphicon glyphicon-share" aria-hidden="true"></span>
-                    </button>
+                    </button> -->
                     <button class="btn btn-danger" id="hangup">
                       <span class="glyphicon glyphicon-earphone" aria-hidden="true"></span>
                       <span class="hidden-xs hidden-sm">Hangup</span>
@@ -266,7 +266,7 @@
 
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="groupInfoTitle">Group info</h4>
+            <h4 class="modal-title" id="groupInfoTitle">Conversation Info</h4>
           </div>
 
           <div class="modal-body">
@@ -277,22 +277,23 @@
                   <a href="#ggen" role="tab" id="ggen-tab" data-toggle="tab" aria-controls="ggen" aria-expanded="true">General</a>
                 </li>
                 <li role="presentation">
-                  <a href="#gmem" role="tab" id="gmem-tab" data-toggle="tab" aria-controls="gmem" aria-expanded="false">Members</a>
+                  <a href="#gmem" role="tab" id="gmem-tab" data-toggle="tab" aria-controls="gmem" aria-expanded="false">Participants</a>
                 </li>
+                <!--
                 <li role="presentation">
                   <a href="#gper" role="tab" id="gper-tab" data-toggle="tab" aria-controls="gper" aria-expanded="false">Permissions</a>
                 </li>
+                -->
               </ul>
               <div class="tab-content">
                 <div role="tabpanel" class="tab-pane active" id="ggen" aria-labelledby="ggen-tab">
                   <h4>General</h4>
                   <div>ID: <span id="groupInfoId"></span></div>
-                  <div>Me: <span id="groupInfoMe"></span></div>
-                  <h4>Meta</h4>
+                  <h4>State</h4>
                   <pre id="groupInfoMetaRaw"></pre>
                 </div>
                 <div role="tabpanel" class="tab-pane" id="gmem" aria-labelledby="gmem-tab">
-                  <h4>Members
+                  <h4>Participants
                     <a class="btn btn-link" data-toggle="collapse" href="#groupInfoMembersRaw">Show JSON</a>
                   </h4>
 
@@ -318,10 +319,12 @@
                   </div>
 
                 </div>
+                <!--
                 <div role="tabpanel" class="tab-pane" id="gper" aria-labelledby="gper-tab">
                   <h4>Permissions</h4>
                   <pre id="groupInfoPermsRaw"></pre>
                 </div>
+                -->
               </div>
             </div>
 
@@ -352,7 +355,7 @@
     <!-- Include Bit6 SDK, only for the web app not Cordova! -->
     <script src="../common/bit6.min.js"></script>
     <!-- app js code -->
-    <script src="../common/index.js"></script>
+    <script src="../common/index-local.js"></script>
     <script src="demo.js"></script>
   </body>
 </html>

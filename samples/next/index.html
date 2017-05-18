@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+    <meta name="description" content="Bit6 P2P Video">
+    <meta name="author" content="Bit6">
+    <title>Video demo</title>
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="next.css" rel="stylesheet">
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">Video demo</a>
+        </div>
+        <p class="navbar-text navbar-right loggedInAddress"></p>
+      </div>
+    </div>
+
+    <div class="container">
+
+      <!-- Main Page -->
+      <div id="main">
+
+          <div class="row">
+
+            <!-- col1 -->
+            <div class="col-sm-4">
+
+              <div class="row top-row" id="join">
+                <h3>Start Session</h3>
+                <div style="margin-bottom: 20px">
+                  <button class="btn btn-primary" type="button" id="createP2pButton">P2P</button>
+                  or
+                  <button class="btn btn-primary" type="button" id="createSfuButton">SFU</button>
+                </div>
+                <h3>Join Session</h3>
+                <div class="input-group">
+                  <input type="text" class="form-control" id="dest" placeholder="Session ID">
+                  <span class="input-group-btn">
+                    <button class="btn btn-primary" type="button" id="joinButton">Join</button>
+                  </span>
+                </div><!-- /input-group -->
+              </div>
+
+              <div class="row top-row hidden" id="info">
+                <h3>Session
+                  <button class="btn btn-default pull-right" id="leaveButton">Leave</button>
+                </h3>
+                <p>ID: <span class="sessionId"></span></p>
+                <p>Mode: <span class="sessionMode"></span></p>
+                <h4>My media</h4>
+                <p><span class="sessionMyMedia"></span></p>
+                <p>
+                  Publish
+                  <button class="btn btn-default btn-xs" id="pubAudio">Audio</button>
+                  <button class="btn btn-default btn-xs" id="pubVideo">Video</button>
+                </p>
+                <h4>Participants</h4>
+                <div id="sessionParticipants"></div>
+              </div>
+
+            </div><!-- /col1 -->
+
+
+            <!-- col2 -->
+            <div class="col-sm-8" style="padding-left: 20px">
+              <div id="videoContainer"></div>
+            </div><!-- /col2 -->
+
+          </div><!-- /.row -->
+
+
+      </div><!-- /#main -->
+
+    </div><!-- /.container -->
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="../common/bit6.min.js"></script>
+    <script src="next.js"></script>
+  </body>
+</html>
