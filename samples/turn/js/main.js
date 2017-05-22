@@ -309,7 +309,4 @@ $(function() {
     showIceServers();
   });
 
-  $('#apikey').val('4oap-2lvnm');
-  $('#apisecret').val('6336bde0ce8ce285811e822144106515');
-
 });

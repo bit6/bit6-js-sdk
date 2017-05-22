@@ -1,6 +1,6 @@
 {
   "name": "bit6",
-  "version": "2.0.0-beta1",
+  "version": "2.0.0-beta.2",
   "description": "Bit6 JavaScript SDK",
   "author": "Bit6 <dev@bit6.com>",
   "main": "./bit6.min.js"

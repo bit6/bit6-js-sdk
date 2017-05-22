@@ -5,7 +5,7 @@ $(function() {
 
     var prefer = {
         identity: 'bob1',
-        device: 'web1'
+        device: 'web' + Math.floor((Math.random() * 1000) + 1)
     };
 
     // Very advanced user and device selector based on the hash in the browser address bar
@@ -276,7 +276,9 @@ function startApp(token) {
             });
         }
         else if (op < 0) {
+            // Clear Session UI
             $('.sessionId').text('');
+            showParticipants(s);
         }
         else {
             return;
