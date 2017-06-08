@@ -1,10 +1,4 @@
-*.swp
 .DS_Store
-components
 node_modules
-docs
-site
-build
-_site
 bit6.js
 bit6.min.js.map
