@@ -7,10 +7,18 @@ function initApp() {
             identity: identity,
             device: device
         };
+
+        var url = 'https://bit6-demo-token-svc.herokuapp.com/token';
+        //var url = 'https://localhost:5001/token';
+
+        // Use browser url to determine if we want to connect to dev or prod Bit6 API
+        if (location.search.indexOf('env=dev') > 0) {
+            url += '?env=dev';
+        }
+
         $.ajax({
             type: 'POST',
-            url: 'https://bit6-demo-token-svc.herokuapp.com/token',
-            //url: 'https://localhost:5001/token',
+            url: url,
             data: data,
             success: function(resp) {cb(null, resp.token);}
         });

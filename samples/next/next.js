@@ -24,13 +24,22 @@ $(function() {
         if (tokens[identity] && tokens[identity].length > 0) {
             return cb(null, tokens[identity]);
         }
+
         var data = {
             identity: identity,
             device: device
         };
+
+        var url = 'https://bit6-demo-token-svc.herokuapp.com/token';
+
+        // Use browser url to determine if we want to connect to dev or prod Bit6 API
+        if (location.search.indexOf('env=dev') > 0) {
+            url += '?env=dev';
+        }
+
         $.ajax({
             type: 'POST',
-            url: 'https://bit6-demo-token-svc.herokuapp.com/token',
+            url: url,
             //url: 'https://localhost:5001/token',
             data: data,
             success: function(resp) {cb(null, resp.token);}
@@ -59,6 +68,14 @@ function startApp(token) {
     console.log('AccessToken', accessToken);
 
     $('.loggedInAddress').text(accessToken.claims.sub);
+
+    //var pushSvc = new bit6.Push(accessToken);
+    //pushSvc.register({service: 'fcm', token: 'abcxyz'}, function(err, d) {
+    //    console.log('Got device', d, err);
+    //});
+    //pushSvc.unregister(function(err, d) {
+    //    console.log('Deleted device', d, err);
+    //});
 
     // Init Signal Service
     var signalSvc = new bit6.Signal(accessToken);

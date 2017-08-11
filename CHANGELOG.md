@@ -2,4 +2,4 @@
 
 ### Features
 
-- Added Signal, Chat and Video APIs
+- Added Chat, Push, Signal, and Video APIs

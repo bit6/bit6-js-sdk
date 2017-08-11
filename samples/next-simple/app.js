@@ -145,6 +145,25 @@ function startApp(token) {
 }
 
 
+// Fetch user JWT token from a sample service
+function fetchToken(identity, device, cb) {
+    var data = {
+        identity: identity,
+        device: device
+    };
+    var url = 'https://bit6-demo-token-svc.herokuapp.com/token';
+    // Use browser url to determine if we want to connect to dev or prod Bit6 API
+    if (location.search.indexOf('env=dev') > 0) {
+        url += '?env=dev';
+    }
+    $.ajax({
+        type: 'POST',
+        url: url,
+        data: data,
+        success: function(resp) {cb(null, resp.token);}
+    });
+}
+
 
 $(function() {
 
@@ -152,19 +171,6 @@ $(function() {
     // Very advanced user selector based on the hash in the browser address bar
     if (location.hash) {
         user = location.hash.substring(1).toLowerCase();
-    }
-
-    function fetchToken(identity, device, cb) {
-        var data = {
-            identity: identity,
-            device: device
-        };
-        $.ajax({
-            type: 'POST',
-            url: 'https://bit6-demo-token-svc.herokuapp.com/token',
-            data: data,
-            success: function(resp) {cb(null, resp.token);}
-        });
     }
 
     var deviceId = 'web' + Math.floor((Math.random() * 1000) + 1);
