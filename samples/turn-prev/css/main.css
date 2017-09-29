@@ -12,15 +12,6 @@ button {
 }
 */
 
-textarea.form-control {
-  font-family: monospace;
-  font-size: 12px;
-}
-
-textarea.form-control.nowrap {
-  white-space: nowrap;
-}
-
 video {
   height: 240px;
   max-width: 100%;

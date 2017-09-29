@@ -28,11 +28,10 @@ function initApp() {
     function authClicked(isNewUser) {
         $('#authError').html('');
         // Convert username to an identity URI
-        var ident = $('#authUsername').val();
-        var pass = $('#authPassword').val();
+        var ident = $('#authUsername').val().trim();
+        var pass = $('#authPassword').val().trim();
         // Call either login or signup function
         var fn = isNewUser ? 'signup' : 'login';
-        //b6.session[fn]({'identity': ident, 'password': pass}, function(err) {
         var deviceId = 'web' + Math.floor((Math.random() * 1000) + 1);
         fetchToken(ident, deviceId, function(err, token) {
             console.log('Got token', token, err);
@@ -165,45 +164,6 @@ function initApp() {
             onVideoElemChange(v, null, null, op);
         });
     }
-
-
-    var b6 = null;
-
-
-/*
-    // Incoming call from another user
-    b6.on('incomingCall', function(c) {
-        console.log('Incoming call', c);
-        attachCallEvents(c);
-        // c.invite is populated with the information about the user
-        // who sent this call request
-        var i = c.invite;
-        // Try to get the sender name as the caller wanted it to be show.
-        // If not specified, do local lookup
-        var fromName = i.sender_name ? i.sender_name : b6.getNameFromIdentity(c.other);
-        // Do we have a group name for this call?
-        var groupName = i.group_name;
-        // Let's format the incoming call message based on the information above
-        var vid = c.options.video ? ' video' : '';
-        var from, info;
-        // Do we have a group name?
-        if (typeof groupName !== 'undefined') {
-            from = groupName.length > 0 ? groupName : 'a group';
-            from = 'Join ' + from + vid + ' call...';
-            info = 'Invited by ' + fromName;
-        }
-        // No group name
-        else {
-            from = fromName + ' is' + vid + ' calling...';
-            info = 'Do you dare to answer this call?';
-        }
-        $('#incomingCallFrom').text(from);
-        $('#incomingCallInfo').text(info);
-        $('#incomingCall')
-            .data({'dialog': c})
-            .show();
-    });
-*/
 
     function onInviteSignal(msg) {
         // Sender will contain a full addres of the other
@@ -877,20 +837,9 @@ function initApp() {
 
     // Start an outgoing call
     function startOutgoingCall(to, video, screen) {
-        //var mediaMode = useMixMediaMode ? 'mix' : 'p2p';
-        // Outgoing call params
-        //var opts = {
-        //    audio: !disableAudio,
-        //    video: video,
-        //    screen: screen,
-        //    //mode: mediaMode
-        //};
         // Start the outgoing call
         prepareInCallUI();
-        //var c = b6.startCall(to, opts);
-        //attachCallEvents(c);
-        //c.connect();
-        //updateInCallUI(c);
+
         videoSvc.create({}, function(err, session) {
             console.log('Started session', err, session);
             // What media we will be publishing
@@ -921,46 +870,6 @@ function initApp() {
 
     // Start an outgoing phone call
     function startPhoneCall(to) {
-        //var c = b6.startPhoneCall(to);
-        //prepareInCallUI();
-        //attachCallEvents(c);
-        //c.connect();
-        //updateInCallUI(c);
-    }
-
-    // Attach call state events to a RtcDialog
-    function attachCallEvents(c) {
-        /*
-        // Call progress
-        c.on('progress', function() {
-            showInCallName();
-            console.log('CALL progress', c);
-        });
-        // Call answered
-        c.on('answer', function() {
-            console.log('CALL answered', c);
-        });
-        // Error during the call
-        c.on('error', function() {
-            console.log('CALL error', c);
-        });
-        // Call ended
-        c.on('end', function() {
-            showInCallName();
-            console.log('CALL ended', c);
-            // No more dialogs?
-            if (b6.dialogs.length === 0) {
-                // Hide InCall UI
-                $('#detailPane').removeClass('hidden');
-                $('#inCallPane').addClass('hidden');
-            }
-            // Hide Incoming Call dialog
-            // TODO: check that it was for this dialog
-            $('#incomingCall')
-                .data({'dialog': null})
-                .hide();
-        });
-        */
     }
 
     function prepareInCallUI() {
@@ -970,26 +879,13 @@ function initApp() {
         $('#inCallPane').removeClass('hidden');
     }
 
-
     function updateInCallUI() {
         showInCallName();
-        // Allow recording only in media mix mode
-        //$('#incallRecord').toggle( c.supports('recording') );
-        //$('#incallRecord').toggleClass('active', c.recording());
-        //$('#incallVideo').toggleClass('active', c.options.video);
-        //$('#incallScreen').toggleClass('active', c.options.screen);
     }
 
     // Show all the call participants
     function showInCallName() {
         var s = '';
-        //for(var i in b6.dialogs) {
-        //    var d = b6.dialogs[i];
-        //    if (i > 0) {
-        //        s += ', ';
-        //    }
-        //    s += b6.getNameFromIdentity(d.other);
-        //}
         $('#inCallOther').text(s);
     }
 
@@ -1051,17 +947,7 @@ function initApp() {
     $('#chatList').on('click', '.tab', function(e) {
         var id = $(this).attr('id');
         var convId = domIdToConversationId(id);
-        // Do we have ongoing calls?
-        //if (b6.dialogs.length > 0) {
-        //    var d = b6.dialogs[0];
-        //    // Add the user to the conversation
-        //    startOutgoingCall(convId, d.options.video);
-        //}
-        // No ongoing calls
-        //else {
-            // Select the chat
-            showChat(convId);
-        //}
+        showChat(convId);
     });
 
     // Clicking on Navbar takes you back into the chat list
@@ -1074,17 +960,6 @@ function initApp() {
     $('#groupInfoModal').on('hidden.bs.modal', function () {
         groupInfoShown = false;
     });
-
-
-    // Click on a message deletes it
-    //$('#msgList').on('click', '.msg', function(e) {
-    //    var id = $(this).attr('id');
-    //    var msgId = domIdToMessageId(id);
-    //    console.log('Clicked to delete message', msgId);
-    //    b6.deleteMessage(msgId, function(err, result) {
-    //        console.log('Msg deleted err=', err, 'result=', result);
-    //    });
-    //});
 
     // When user clicks on New Chat, give focus to Username
     $('#newChatDropdown').on('shown.bs.dropdown', function () {
@@ -1169,9 +1044,6 @@ function initApp() {
     // Delete a Conversation
     $('#deleteChatButton').click(function() {
         console.log('Delete current conversation');
-        //b6.deleteConversation(currentConvId, function(err) {
-        //    console.log('Conversation deleted');
-        //});
         return false;
     });
 
@@ -1332,13 +1204,7 @@ function initApp() {
     });
 
     $('#incallRecord').click(function() {
-        //var x = b6.dialogs.slice();
-        // Adjust only the first call controller
-        //if (x.length > 0) {
-        //    var c = x[0];
-        //    // Toggle recording
-        //    c.recording( !c.recording() );
-        //}
+        // TODO
     });
 
 
@@ -1352,15 +1218,7 @@ function initApp() {
     });
 
     $('#incallScreen').click(function() {
-        var x = b6.dialogs.slice();
-        // Adjust only the first call controller
-        if (x.length > 0) {
-            var c = x[0];
-            // Toggle screen
-            var t = !c.options.screen;
-            c.connect({screen: t});
-            updateInCallUI();
-        }
+        // TODO
     });
 
     // 'Call Hangup' click
@@ -1385,7 +1243,6 @@ function initApp() {
         $('#loggedInUser').text('');
         $('#chatList').empty();
         $('#msgList').empty();
-        //b6.session.logout();
         chatSvc.destroy();
         videoSvc.destroy();
         signalSvc.destroy();

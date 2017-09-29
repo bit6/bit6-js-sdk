@@ -196,7 +196,6 @@ function onIceCandidate(pc, event) {
   if (forceTurn && event.candidate && event.candidate.candidate) {
     // Ignore all non-relay candidates
     if (event.candidate.candidate.indexOf('relay') < 0) {
-      trace(getName(pc) + ' ICE candidate: IGNORE non relay');
       return;
     }
   }
@@ -253,20 +252,21 @@ function getMyConfig(name) {
   return conf;
 }
 
-function fetchIceServers(jwt, cb) {
-    // This is a Bit6 JWT token which has the API endpoint URL in the 'aud' claim.
-    var parts = jwt.split('.');
-    if (!parts || parts.length != 3) {
-      return cb('Incorrect JWT');
+function fetchIceServers(key, secret, opts, cb) {
+    var host = 'api.bit6.com';
+    if (opts && opts.env) {
+      if (opts.env === 'dev') {
+        host = 'api.b6dev.net';
+      }
     }
-    var claimsStr = atob( parts[1] );
-    var claims = JSON.parse(claimsStr);
-    var url = claims.aud + '/video/v1/ice';
-    // Use query, but can also use header
-    url += '?jwt=' + jwt;
+    var url = 'https://' + host + '/backend/1/ice';
+    var data = {
+      _auth: 'basic ' + btoa(key + ':' + secret)
+    };
     $.ajax({
         type: 'POST',
         url: url,
+        data: data,
         success: function(resp) {cb(null, resp);}
     });
 }
@@ -276,7 +276,13 @@ function showIceServers() {
   var txt = e.data('iceServers');
   var dc = $('#dc').val();
   if (dc.length > 0) {
-    txt = txt.replace(/turn\.b6\.io/g, 'turn-' + dc + '.b6.io');
+    var env = $('#env').val();
+    if (env === 'dev') {
+      txt = txt.replace(/turn\./g, 'turn-' + dc + '.');
+    }
+    else {
+      txt = txt.replace(/turn\.bit6\.com/g, 'turn-' + dc + '.b6.io');
+    }
   }
   e.val(txt);
 }
@@ -284,8 +290,10 @@ function showIceServers() {
 $(function() {
 
   $('#getIceServersButton').click(function() {
-    var jwt = $('#jwt').val();
-    fetchIceServers(jwt, function(err, result) {
+    var env = $('#env').val();
+    var key = $('#apikey').val();
+    var secret = $('#apisecret').val();
+    fetchIceServers(key, secret, {env: env}, function(err, result) {
       console.log('Got ICE', err, result);
       if (result && result.iceServers) {
         var txt = JSON.stringify(result.iceServers, null, 2);
