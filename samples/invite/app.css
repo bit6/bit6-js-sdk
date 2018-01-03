@@ -1,0 +1,67 @@
+body {
+  padding-top: 50px;
+}
+
+.intro {
+  padding: 20px 15px;
+  text-align: center;
+}
+
+.bg-danger > p {
+  padding: 10px;
+}
+
+.top-row {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.top-row h3 {
+  margin-top: 5px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+#videoContainer {
+  position: relative;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  top: 20px;
+  margin: 0px;
+  text-align: center;
+  height: 400px;
+  border: 1px solid #eee;
+}
+
+.local {
+  border: 1px solid #0f0;
+  transform: rotateY(180deg);
+  -webkit-transform:rotateY(180deg);
+  -moz-transform:rotateY(180deg);
+}
+
+#videoContainer.simple > .remote {
+  max-width: 100%;
+  max-height: 100%;
+  width: 100%;
+}
+
+#videoContainer.simple > .local {
+  max-width: 30%;
+  max-height: 30%;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  border-left: 1px solid #fff;
+  border-bottom: 1px solid #fff;
+  width: auto;
+  height: auto;
+}
+
+#videoContainer.grid > video {
+  max-width: 50%;
+  max-height: 50%;
+  padding: 2px;
+}

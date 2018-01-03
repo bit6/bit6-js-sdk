@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+    <meta name="description" content="Bit6 P2P Video">
+    <meta name="author" content="Bit6">
+    <title>Invite Service Demo</title>
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="app.css" rel="stylesheet">
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">Invite Service Demo</a>
+        </div>
+        <p class="navbar-text navbar-right loggedInAddress"></p>
+      </div>
+    </div>
+
+    <div class="container">
+
+      <!-- Main Page -->
+      <div id="main">
+
+          <div class="row">
+
+            <!-- col1 -->
+            <div class="col-sm-4">
+
+              <div class="row top-row" id="join">
+                <h3>Invite</h3>
+                <div class="input-group">
+                  <input type="text" class="form-control" id="dest" placeholder="Destination">
+                  <span class="input-group-btn">
+                    <button class="btn btn-primary" type="button" id="inviteButton">Send</button>
+                  </span>
+                </div><!-- /input-group -->
+              </div>
+
+              <div class="row top-row hidden" id="info">
+                <h3>Session
+                  <button class="btn btn-default pull-right" id="leaveButton">Leave</button>
+                </h3>
+                <p>ID: <span class="sessionId"></span></p>
+              </div>
+
+            </div><!-- /col1 -->
+
+
+            <!-- col2 -->
+            <div class="col-sm-8" style="padding-left: 20px">
+              <div id="videoContainer"></div>
+            </div><!-- /col2 -->
+
+          </div><!-- /.row -->
+
+
+      </div><!-- /#main -->
+
+    </div><!-- /.container -->
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="../common/bit6.min.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

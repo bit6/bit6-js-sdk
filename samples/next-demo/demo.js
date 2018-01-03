@@ -1,6 +1,10 @@
 
 // Initialize the application
-function initApp() {
+// If rememberAuth is true - save auth token in localStorage
+// If inviteWithPushActions is true - we rely on system push
+// notificiation actions to handle invite accept/reject instead
+// of using in-app UI. This is mostly for Android
+function initApp(rememberAuth, inviteWithPushActions) {
 
     function fetchToken(identity, device, cb) {
         var data = {
@@ -9,11 +13,12 @@ function initApp() {
         };
 
         var url = 'https://bit6-demo-token-svc.herokuapp.com/token';
-        //var url = 'https://localhost:5001/token';
-
         // Use browser url to determine if we want to connect to dev or prod Bit6 API
-        if (location.search.indexOf('env=dev') > 0) {
+        if (location.search.indexOf('env=dev') >= 0) {
             url += '?env=dev';
+        }
+        else if (location.search.indexOf('env=local') >= 0) {
+            url = 'https://localhost:5001/token';
         }
 
         $.ajax({
@@ -22,6 +27,26 @@ function initApp() {
             data: data,
             success: function(resp) {cb(null, resp.token);}
         });
+    }
+
+    function saveAuthToken(token) {
+        if (!rememberAuth) {
+            return;
+        }
+        console.log('Saving token', token);
+        if (token) {
+            window.localStorage.setItem('bxdemo_auth', token);
+        } else {
+            window.localStorage.removeItem('bxdemo_auth');
+        }
+    }
+
+    function loadAuthToken() {
+        if (!rememberAuth) {
+            return null;
+        }
+        var token = window.localStorage.getItem('bxdemo_auth');
+        return token;
     }
 
     // Common click handler for signup and login buttons
@@ -59,7 +84,7 @@ function initApp() {
 
 
     // Bit6 Services
-    var accessToken, signalSvc, chatSvc, videoSvc;
+    var accessToken, signalSvc, chatSvc, videoSvc, pushSvc, inviteSvc;
     // Disable all audio in this demo
     var disableAudio = false;
     // Use 'mix' media mode for new calls
@@ -71,28 +96,24 @@ function initApp() {
 
 
     function authDone(token) {
-
         accessToken = new bit6.AccessToken(token);
         accessToken.on('expired', function(t) {
             console.log('AccessToken expired, need to renew', t);
+            saveAuthToken(null);
             // Fetch the new token from your application server or Bit6 Auth service
             // Then update it by calling:
             // t.update('new-token-here');
         });
         console.log('AccessToken', accessToken);
-        // Init Signal Service
+        if (accessToken.token) {
+            saveAuthToken(accessToken.token)
+        }
+
+        // Init Bit6 Services
         signalSvc = new bit6.Signal(accessToken);
-
-        // Update the UI
-        $('#welcome').toggle(false);
-        $('#main').removeClass('hidden');
-        $('#loggedInNavbar').removeClass('hidden');
-        $('#loggedInUser').text( accessToken.claims.sub );
-        $('body').removeClass('detail');
-
-
         chatSvc = new bit6.Chat(signalSvc, {sync: true});
         videoSvc  = new bit6.Video(signalSvc);
+        inviteSvc = new bit6.Invite(signalSvc);
 
         // Expose the services into global namespace
         // for easier access from browser dev console
@@ -103,25 +124,6 @@ function initApp() {
         chatSvc.on('conversation', function(c, op) {
             //console.log('onConv', c);
             onConversationChange(c, op);
-        });
-
-        // We will get direct messages about call invite / hangup
-        signalSvc.on('message', function(msg) {
-            switch(msg.type) {
-                // Incoming call invitation
-                case 'invite':
-                    onInviteSignal(msg);
-                    break;
-                // Incoming call was handled by another device of the same user
-                case 'accepted':
-                case 'declined':
-                    onInviteHandledSignal(msg);
-                    break;
-                // Incoming call that was sent from this client was declined
-                case 'decline':
-                    onDeclineSignal(msg);
-                    break;
-            }
         });
 
         // Video session created / updated / deleted
@@ -155,6 +157,8 @@ function initApp() {
             // Video Session removed
             else if (op < 0) {
                 $('.sessionId').text('');
+                $('#detailPane').removeClass('hidden');
+                $('#inCallPane').addClass('hidden');
             }
         });
 
@@ -163,58 +167,85 @@ function initApp() {
             console.log('Local video elem', op, v);
             onVideoElemChange(v, null, null, op);
         });
+
+        // Handle new invites to show in-app Incoming Call UI
+        // On Android we rely on system Push actions instead
+        inviteSvc.on('invite', function(invite) {
+            console.log('Got invite', invite);
+            if (inviteWithPushActions) {
+                console.log('Invite will be handled with Push Actions');
+                return;
+            }
+            invite.on('handled', function(accepted) {
+                console.log('Incoming invite handled on another device', invite, accepted);
+                hideIncomingCallDialog(invite);
+            });
+            invite.on('timeout', function() {
+                console.log('Incoming invite timeout', invite);
+                hideIncomingCallDialog(invite);
+            });
+            // Display UI for this invite
+            if (invite.active) {
+                showIncomingCallDialog(invite);
+            }
+        });
+
+        // Init Push Service
+        initPushService();
+
+        // Update the UI
+        $('#welcome').toggle(false);
+        $('#main').removeClass('hidden');
+        $('#loggedInNavbar').removeClass('hidden');
+        $('#loggedInUser').text( accessToken.claims.sub );
+        $('body').removeClass('detail');
     }
 
-    function onInviteSignal(msg) {
+    function initPushService() {
+        // Platform-specific push support code
+        // pushSvc = new bit6.Push(accessToken);
+    }
+
+    // Show in-app Incoming Call UI
+    function showIncomingCallDialog(invite) {
+
         // Sender will contain a full addres of the other
         // user's client connection: identity/device/route
-        var sender = msg.from;
+        var sender = invite.from;
         var ident = sender.split('/')[0];
-        var sessionId = msg.data.session;
-        var convId = msg.data.conversation;
-        var media = msg.data.media;
+        var p = invite.payload;
+        var sessionId = p.session;
+        var convId = p.conversation;
+        var media = p.media || {};
         console.log('Invite from', ident, 'in Conv id=', convId, 'to join Session id=', sessionId);
 
         var fromName = ident;
-        // Do we have a group name for this call?
-        var groupName; // = i.group_name;
-        // Let's format the incoming call message based on the information above
-        var vid = media.video ? ' video' : '';
-        var fromStr, info;
-        // Do we have a group name?
-        if (typeof groupName !== 'undefined') {
-            fromStr = groupName.length > 0 ? groupName : 'a group';
-            fromStr = 'Join ' + fromStr + vid + ' call...';
-            info = 'Invited by ' + fromName;
-        }
-        // No group name
-        else {
-            fromStr = fromName + ' is' + vid + ' calling...';
-            info = 'Do you dare to answer this call?';
-        }
+
+        var fromStr = (media.video ? 'Video call' : 'Call') + ' from ' + fromName + '...';
+        var info = 'Do you dare to answer it?';
+
         $('#incomingCallFrom').text(fromStr);
         $('#incomingCallInfo').text(info);
         $('#incomingCall')
-            .data({'invite': msg})
+            .data({invite: invite})
             .show();
     }
 
-    function onInviteHandledSignal(msg) {
+    // Hide in-app Incoming Call UI
+    // Called if invite was handled by another device
+    // or if it has timed out
+    function hideIncomingCallDialog(invite) {
         var e = $('#incomingCall');
         var d = e.data();
-        var invite = d ? d.invite : null;
-        if (invite) {
+        var x = d ? d.invite : null;
+        if (x) {
             // This Incoming Call invite was handled by another device of this user
-            if (invite.data.session === msg.data.session) {
+            if (x.id === invite.id) {
                 // Dismiss this Incoming Call UI
-                e.data({'invite': null});
+                e.data({invite: null});
                 e.hide();
             }
         }
-    }
-
-    function onDeclineSignal(msg) {
-        console.log('My call invite was declined', msg);
     }
 
 
@@ -788,15 +819,6 @@ function initApp() {
         c.compose().text(text).send();
     }
 
-    function sendControlSignal(to, type, data) {
-        var opts = {
-            to: to,
-            type: type,
-            data: data
-        };
-        signalSvc.send(opts);
-    }
-
     // User selected file(s) to attach to a message
     function handleAttachFiles(files) {
         // files is a FileList of File objects. List some properties.
@@ -836,6 +858,7 @@ function initApp() {
     }
 
     // Start an outgoing call
+    // to - Conversation ID
     function startOutgoingCall(to, video, screen) {
         // Start the outgoing call
         prepareInCallUI();
@@ -851,25 +874,124 @@ function initApp() {
             // Start publishing
             session.me.publish(media);
 
-            var c = chatSvc.conversations[currentConvId];
-            // Let's send Session ID to the recipients so they can join.
-            // We invent our own signaling format.
-            var inviteInfo = {
-                session: session.id,
-                conversation: c.id,
-                media: media
-            };
-            // We can publish the invite to the Signal Channel corresponding
-            // to the Chat Conversation. Or just send it to each individual
-            // Conversation Participant.
-            for(var id in c.participants) {
-                sendControlSignal(id, 'invite', inviteInfo);
-            }
+            // Invite all Conversation participants to join a Video Session
+            var c = chatSvc.conversations[to];
+            inviteToJoinSession(c, session.id, media);
         });
+    }
+
+    function inviteToJoinSession(conv, sessionId, media) {
+        var fromName = accessToken.identity;
+
+        var text1 = 'Incoming call from ' +  fromName + '...';
+        var text2 = 'Missed call from ' + fromName;
+
+        // Let's send Session ID to the recipients so they can join.
+        // We invent our own payload for invite.
+        var inviteInfo = {
+            session: sessionId,
+            conversation: conv.id,
+            media: media
+        };
+        // Build invite payloads - for invite and timeout messages
+        // Since we know that on Android and iOS we are using Cordova Push Plugin
+        // we leverage its capabilities.
+        // https://github.com/phonegap/phonegap-plugin-push/blob/master/docs/PAYLOAD.md
+        // Note that invite payload is stored in 'data.invite' object for FCM and APNS
+        var inviteMsg = {
+            signal: inviteInfo,
+            apns: {
+                aps: {
+                    alert: text1
+                },
+                data: {
+                    invite: inviteInfo
+                }
+            },
+            fcm: {
+                data: {
+                    title: 'Incoming Call',
+                    message: fromName + ' is calling...',
+                    actions: [
+                        {title: 'Answer', callback: 'inviteAccept', foreground: true},
+                        {title: 'Decline', callback: 'inviteReject', foreground: false}
+                    ],
+                    priority: 2,
+                    // If you want to wake up the app on 'Decline' action in push
+                    // to send 'reject' invite response. Otherwise 'timeout' push
+                    // will still arrive to the device
+                    'force-start': 1,
+                    invite: inviteInfo
+                }
+            }
+        };
+
+        var timeoutMsg = {
+            signal: {},
+            apns: {
+                aps: {
+                    alert: text2
+                }
+            },
+            fcm: {
+                data: {
+                    title: text2,
+                    'content-available': '1'
+                }
+            }
+        };
+
+        // Send Invite to each Conversation Participant
+        for(var id in conv.participants) {
+            var o = {
+                to: id,
+                ttl: 30,
+                payload: inviteMsg,
+                timeout: timeoutMsg,
+            };
+            inviteSvc.send(o, function(err, invite) {
+                console.log('Sent invite', err, invite);
+                invite.on('accept', function(data) {
+                    console.log('Invite accepted', invite, data);
+                });
+                invite.on('reject', function(data) {
+                    console.log('Invite rejected', invite, data);
+                });
+                invite.on('timeout', function() {
+                    console.log('Invite timeout', invite);
+                });
+            });
+        }
     }
 
     // Start an outgoing phone call
     function startPhoneCall(to) {
+    }
+
+    // Accept incoming invite, update UI
+    // and join audio/video session
+    // If video is true - answer with video
+    function acceptIncomingInvite(invite, audio, video) {
+        invite.accept()
+        // SessionId
+        var id = invite.payload.session;
+        // Accept the call, send local audio+video
+        prepareInCallUI();
+        videoSvc.join(id, function(err, session) {
+            // Final 'session.id' may not be the same as 'id' used in session.join()
+            console.log('Joined session', session.id, err);
+            // By default, publish same media as the caller
+            var media = Object.assign({}, invite.payload.media);
+            // Override audio
+            if (typeof audio !== 'undefined') {
+                media.audio = audio;
+            }
+            // Override video
+            if (typeof video !== 'undefined') {
+                media.video = video;
+            }
+            session.me.publish(media);
+        });
     }
 
     function prepareInCallUI() {
@@ -1149,6 +1271,7 @@ function initApp() {
         }
     });
 
+    // In-app Incoming Call UI
 
     // 'Answer Incoming Call' click
     $('#answerAudio').click(function() {
@@ -1156,17 +1279,8 @@ function initApp() {
         var d = e.data();
         var invite = d ? d.invite : null;
         if (invite) {
-            e.data({'invite': null});
-            // Tell this user's other devices, that the call is accepted
-            sendControlSignal(invite.to, 'accepted', invite.data);
-            // SessionId
-            var id = invite.data.session;
-            // Accept the call, send local audio only
-            prepareInCallUI();
-            videoSvc.join(id, function(err, session) {
-                console.log('Join session', id, err);
-                session.me.publish({audio: true});
-            });
+            e.data({invite: null});
+            acceptIncomingInvite(invite, true, false);
         }
     });
 
@@ -1175,17 +1289,8 @@ function initApp() {
         var d = e.data();
         var invite = d ? d.invite : null;
         if (invite) {
-            e.data({'invite': null});
-            // Tell this user's other devices, that the call is accepted
-            sendControlSignal(invite.to, 'accepted', invite.data);
-            // SessionId
-            var id = invite.data.session;
-            // Accept the call, send local audio+video
-            prepareInCallUI();
-            videoSvc.join(id, function(err, session) {
-                console.log('Join session', id, err);
-                session.me.publish({audio: !disableAudio, video: true});
-            });
+            e.data({invite: null});
+            acceptIncomingInvite(invite, !disableAudio, true);
         }
     });
 
@@ -1195,11 +1300,9 @@ function initApp() {
         var d = e.data();
         var invite = d ? d.invite : null;
         if (invite) {
-            e.data({'invite': null});
-            // Tell this user's other devices, that the call is declined
-            sendControlSignal(invite.to, 'declined', invite.data);
-            // Decline call - tell the caller's device
-            sendControlSignal(invite.from, 'decline', invite.data);
+            e.data({invite: null});
+            // Reject call - will notify the caller and other user's devices
+            invite.reject()
         }
     });
 
@@ -1223,8 +1326,6 @@ function initApp() {
 
     // 'Call Hangup' click
     $('#hangup').click(function() {
-        $('#detailPane').removeClass('hidden');
-        $('#inCallPane').addClass('hidden');
         // End all active sessions
         for(var id in videoSvc.sessions) {
             var s = videoSvc.sessions[id];
@@ -1234,6 +1335,11 @@ function initApp() {
 
     // Logout click
     $('#logout').click(function() {
+        if (pushSvc) {
+            pushSvc.unregister(function(err) {
+                console.log('PushSvc unregistered', err);
+            });
+        }
         currentConvId = null;
         groupInfoShown = false;
         showChatTitle();
@@ -1249,13 +1355,12 @@ function initApp() {
         accessToken.destroy();
         window.chatSvc = null;
         window.videoSvc = null;
+        saveAuthToken(null);
     });
 
+
+    var token = loadAuthToken();
+    if (token && token.length > 0) {
+        authDone(token);
+    }
 }
-
-
-
-$(function() {
-    initApp();
-});
-

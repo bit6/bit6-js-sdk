@@ -67,7 +67,7 @@ $(function() {
     }
 
     // Use browser url to determine if we want to connect to dev or prod Bit6 API
-    if (location.search.indexOf('env=dev') > 0) {
+    if (location.search.indexOf('env=dev') >= 0) {
         // Demo for development environment
         opts = {
             apikey: '91aaadb643df4107acb2797414ccdf75',
