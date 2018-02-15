@@ -1,23 +1,26 @@
-Bit6 JS SDK
+Bit6 JS SDK v2
 =======================
-[![GitHub version](https://badge.fury.io/gh/bit6%2Fbit6-js-sdk.svg)](https://github.com/bit6/bit6-js-sdk)
-[![Bower version](https://badge.fury.io/bo/bit6.svg)](https://github.com/bit6/bit6-js-sdk)
 
-Bit6 is a real-time, cloud-based communications-as-a-service platform that allows mobile and web application developers to quickly and easily add voice/video calling, texting, and multimedia messaging capabilities into their apps.
+Bit6 is a cloud communication platform that makes it easy to add communication capabilities into any application. It provides APIs and SDKs for WebRTC audio/video, IP messaging as well as programmable PSTN voice and SMS.
+
 
 ### Documentation
-* [Quick Start](http://docs.bit6.com/start/web-js/)
-* [Developer Guide](http://docs.bit6.com/guides/js/)
+* [Quick Start](https://bx-docs-dev.netlify.com/start/web-js/)
+* [Developer Guide](https://bx-docs-dev.netlify.com/guides/js2-intro/)
+
 
 ### Live Demos
-We have two live demos that you can try right now:
 
-1. [demo.bit6.com](http://demo.bit6.com) - select 'Signup' and create a username. Open another browser window and login as a different user. You will be able to chat and make video calls between the browsers.
+There are multiple live demos that you can try right now:
+
+1. [Web demos](https://bit6-demo-next.firebaseapp.com/) - click on any of the links on that page.
 
 2. [videocalls.io](https://videocalls.io) - one-click video calling with your Facebook friends. Go to [videocalls.io](https://videocalls.io), click 'Start Calling'. You will see a list of your friends who have done the same. Click on a friend's name to start a video call.
 
+
 ### Samples
-The source code for [demo.bit6.com](http://demo.bit6.com) is included in the [samples](https://github.com/bit6/bit6-js-sdk/tree/master/samples) folder of this repo.
+The source code for the demos is included in the [samples](https://github.com/bit6/bit6-js-sdk/tree/next/samples) folder of this repo.
+
 
 ### Platforms
-Bit6 SDKs are available for: [iOS](https://github.com/bit6/bit6-ios-sdk), [Android](https://github.com/bit6/bit6-android-sdk), [JavaScript](https://github.com/bit6/bit6-js-sdk) and [Cordova](https://github.com/bit6/bit6-cordova).
+Bit6 JS SDK can be used in web browsers, [Cordova](https://github.com/bit6/bit6-cordova/tree/next) and [React Native](https://github.com/bit6/bit6-react-native-samples) applications..
